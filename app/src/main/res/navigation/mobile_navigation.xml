@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_home">
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.acim.walk.ui.home.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_nav_newmatch"
+            app:destination="@id/nav_newmatch" />
+        <action
+            android:id="@+id/action_nav_home_to_search_opponent_layout"
+            app:destination="@id/search_opponent_layout" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/search_opponent_layout"
+        android:name="com.acim.walk.ui.searchmatch.SearchMatchFragment"
+        android:label="@string/menu_searchmatch"
+        tools:layout="@layout/fragment_searchmatch" />
+
+    <fragment
+        android:id="@+id/nav_newmatch"
+        android:name="com.acim.walk.ui.newmatch.NewmatchFragment"
+        android:label="@string/menu_newmatch"
+        tools:layout="@layout/fragment_newmatch" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.acim.walk.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
+</navigation>
