@@ -10,11 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
 import com.google.android.gms.tasks.Task;
+
+import org.w3c.dom.Text;
 
 import java.util.Random;
 
@@ -23,6 +26,8 @@ public class SearchMatchFragment extends Fragment {
     private SearchMatchViewModel searchMatchViewModel;
     private MessageListener myMessageListener;
     private Message myMessage;
+
+    private String userID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,11 +39,20 @@ public class SearchMatchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        View root = inflater.inflate(R.layout.fragment_searchmatch, container, false);
+
+        // Get userID from MainActivity function, getUserID()
+        MainActivity activity = (MainActivity)getActivity();
+        userID = activity != null ? activity.getUserID() : "NaN";
+
+        // Show on screen own user ID
+        TextView userIDTextView = (TextView) root.findViewById(R.id.userID_text);
+        userIDTextView.setText(userID);
+
         searchMatchViewModel =
                 new ViewModelProvider(this).get(SearchMatchViewModel.class);
-        // Inflate the layout for this fragment
 
-        // Create the object with the correct methods
+        // Create a message listener, used with Nearby subscribe/unsubscribe
         myMessageListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
@@ -51,26 +65,28 @@ public class SearchMatchFragment extends Fragment {
             }
         };
 
-        // Message contains a random value
-        int randomValue = new Random().nextInt(10);
-        myMessage = new Message(Integer.toString(randomValue).getBytes());
+        // Create a message that contains user ID, used with Nearby publish/unpublish
+        myMessage = new Message(userID.getBytes());
 
-        return inflater.inflate(R.layout.fragment_searchmatch, container, false);
+        // Inflate the layout for this fragment
+        return root;
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
+        // Methods to lets devices exchange small data. With publish, application sends a message and
+        // with subscribe, application will hear if some message arrives
         Nearby.getMessagesClient(super.requireActivity()).publish(myMessage);
-        Task<Void> value = Nearby.getMessagesClient(super.requireActivity()).subscribe(myMessageListener);
-        // final TextView opponentsID = root.findViewById(R.id.opponent_id);
-        // opponentsID.setText(value.toString());
+        Nearby.getMessagesClient(super.requireActivity()).subscribe(myMessageListener);
+
     }
 
     @Override
     public void onStop() {
 
+        // Close the methods publish and subscripe, so close Nearby function
         Nearby.getMessagesClient(super.requireActivity()).unpublish(myMessage);
         Nearby.getMessagesClient(super.requireActivity()).unsubscribe(myMessageListener);
 
