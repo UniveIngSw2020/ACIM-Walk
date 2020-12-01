@@ -32,21 +32,28 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.acim.walk.Database;
+import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
 import com.acim.walk.ui.newmatch.NewmatchFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class HomeFragment extends Fragment implements SensorEventListener2 {
 
     private HomeViewModel homeViewModel;
     private TextView currentStepsTxt;
     private Button newMatchBtn, searchOpponent;
-
+    FirebaseFirestore dbfirestore = FirebaseFirestore.getInstance();
     private int todayOffset, total_start, since_boot, total_days;
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
     private boolean showSteps = true;
@@ -104,6 +111,37 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
 
         Database db = Database.getInstance(getActivity());
 
+        FirebaseFirestore dbfirestore = FirebaseFirestore.getInstance();
+        MainActivity activity = (MainActivity)getActivity();
+        String userID = activity != null ? activity.getUserID() : "NaN";
+
+        DocumentReference currentUserDocRef = dbfirestore.collection("users").document("prova");
+
+/*
+        Map<String, String> temp = new HashMap<>();
+        temp.put("testTipoStringa", "OK!");
+        temp.put("Secondo", "OK2");*/
+
+        Map<String, String> temp = new HashMap<>();
+        temp.put("terzo", "OK3");
+
+        currentUserDocRef
+                .set(temp)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("TEST SCRITTURA", "DocumentSnapshot successfully written!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("TEST SCRITTURA", "Error writing document", e);
+                    }
+                });
+
+
+
         Log.i("LOG", db.toString());
 
         // read todays offset
@@ -118,12 +156,11 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         // register a sensorlistener to live update the UI if a step is taken
         SensorManager sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        /*
+/*
         if (sensor == null) {
 
             // L'APP mi crasha nell'emulatore
 
-            /*
             new AlertDialog.Builder(getActivity()).setTitle("Sensori richiesti assenti")
                     .setMessage("Il tuo telefono non supporta l'applicazione")
                     .setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -137,14 +174,14 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
                     dialogInterface.dismiss();
                 }
             }).create().show();
-            */
+
 
 
         } else {
             sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
         }
-        */
 
+*/
         since_boot -= pauseDifference;
 
         total_start = db.getTotalWithoutToday();
