@@ -1,14 +1,15 @@
-package com.acim.walk;
+package com.acim.walk.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.acim.walk.MainActivity;
+import com.acim.walk.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -26,13 +27,9 @@ import androidx.navigation.fragment.NavHostFragment;
  */
 
 
-public class FirstFragment extends Fragment {
-
-
+public class LoginFragment extends Fragment {
     // Firebase Auth instance
     private FirebaseAuth mAuth;
-
-
 
     /**
      *
@@ -56,11 +53,11 @@ public class FirstFragment extends Fragment {
                             if(name == null) name="NULLA";
                             if(email == null) email = "NULLA";
 
-
-                            Toast.makeText(getContext(), "SEI DENTRO.",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "You're logged in.",Toast.LENGTH_SHORT).show();
 
                             // taking logged user to MainActivity
                             Intent myIntent = new Intent(getActivity(), MainActivity.class);
+                            myIntent.putExtra("userID",user.getUid());
                             getActivity().startActivity(myIntent);
 
                         } else {
@@ -74,24 +71,17 @@ public class FirstFragment extends Fragment {
                 });
     }
 
-
-
-
-
-
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false);
+        return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
 
         // setting up Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -99,8 +89,6 @@ public class FirstFragment extends Fragment {
         // referencing objects
         final EditText email = getView().findViewById(R.id.email_editext);
         final EditText password = getView().findViewById(R.id.password_editext);
-
-
 
         /*
          * login button onClick handler
@@ -116,10 +104,8 @@ public class FirstFragment extends Fragment {
 
                 // authenticating user
                 loginAccount(emailValue, passwordValue);
-
             }
         });
-
 
         /*
          * label below the login button onClick handler
@@ -128,11 +114,9 @@ public class FirstFragment extends Fragment {
         view.findViewById(R.id.signup_label).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(FirstFragment.this)
+                NavHostFragment.findNavController(LoginFragment.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         });
-
-
     }
 }

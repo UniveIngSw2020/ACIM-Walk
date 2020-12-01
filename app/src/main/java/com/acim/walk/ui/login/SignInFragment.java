@@ -1,14 +1,15 @@
-package com.acim.walk;
+package com.acim.walk.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.acim.walk.MainActivity;
+import com.acim.walk.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,16 +35,12 @@ import androidx.navigation.fragment.NavHostFragment;
  */
 
 
-public class SecondFragment extends Fragment {
+public class SignInFragment extends Fragment {
 
     // Firebase Auth instance
     private FirebaseAuth mAuth;
-
     // Firebase Firestore instance
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
-
 
     private static final String TAG = "EmailPassword";
 
@@ -63,7 +60,7 @@ public class SecondFragment extends Fragment {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
 
-                            Toast.makeText(getContext(), "NUOVO USER CREATO.",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "New user created.",Toast.LENGTH_SHORT).show();
 
 
                             // this may be useful for some features
@@ -78,7 +75,7 @@ public class SecondFragment extends Fragment {
                         } else {
                             // If sign in fails, display a message to the user.
                             //Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getContext(), "ERRORE CREAZIONE USER.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Error while creating a new user.", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -129,26 +126,19 @@ public class SecondFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_second, container, false);
+        return inflater.inflate(R.layout.fragment_signin, container, false);
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-
-
         // setting up Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-
 
         // getting references
         final EditText email = getView().findViewById(R.id.email_signup_editext);
         final EditText password = getView().findViewById(R.id.password_signup_editext);
         final EditText username = getView().findViewById(R.id.username_signup_editext);
-
-
-
 
         /*
          * signup button onClick handler
@@ -179,7 +169,7 @@ public class SecondFragment extends Fragment {
         view.findViewById(R.id.login_label).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(SecondFragment.this)
+                NavHostFragment.findNavController(SignInFragment.this)
                         .navigate(R.id.action_SecondFragment_to_FirstFragment);
             }
         });

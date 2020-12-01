@@ -28,12 +28,18 @@ import androidx.appcompat.widget.Toolbar;
 public class MainActivity extends AppCompatActivity /*implements SensorEventListener2*/ {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private String userID = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         startService(new Intent(this, SensorListener.class));
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            userID = extras.getString("userID");
+        }
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -52,6 +58,10 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+    }
+
+    public String getUserID() {
+        return userID;
     }
 
     @Override
