@@ -118,6 +118,7 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         // register a sensorlistener to live update the UI if a step is taken
         SensorManager sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        /*
         if (sensor == null) {
             new AlertDialog.Builder(getActivity()).setTitle("Sensori richiesti assenti")
                     .setMessage("Il tuo telefono non supporta l'applicazione")
@@ -135,6 +136,7 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         } else {
             sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
         }
+        */
 
         since_boot -= pauseDifference;
 
