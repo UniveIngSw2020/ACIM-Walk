@@ -190,9 +190,6 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         db.close();
     }
 
-
-
-
     @Override
     public void onPause() {
         super.onPause();

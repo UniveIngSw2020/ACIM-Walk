@@ -35,8 +35,6 @@ import androidx.navigation.fragment.NavHostFragment;
 public class LoginFragment extends Fragment {
     // Firebase Auth instance
     private FirebaseAuth mAuth;
-
-
     /**
      *
      * Logs user

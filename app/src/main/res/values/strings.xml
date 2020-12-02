@@ -23,4 +23,5 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
     <string name="userID">User ID:</string>
+    <string name="startMatch">Walk!</string>
 </resources>
