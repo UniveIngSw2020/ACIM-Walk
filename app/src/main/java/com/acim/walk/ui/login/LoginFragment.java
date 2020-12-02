@@ -1,5 +1,9 @@
 package com.acim.walk.ui.login;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +14,7 @@ import android.widget.Toast;
 
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
+import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -31,6 +36,7 @@ public class LoginFragment extends Fragment {
     // Firebase Auth instance
     private FirebaseAuth mAuth;
 
+
     /**
      *
      * Logs user
@@ -39,6 +45,12 @@ public class LoginFragment extends Fragment {
      * @param password
      */
     private void loginAccount(String email, String password) {
+
+        // displays progress bar while user waits for the device to comunicate w/ Firebase
+        ProgressDialog progress = Util.createProgressBar(getContext(), Util.PROGRESS_DIALOG_TITLE, Util.PROGRESS_DIALOG_MESSAGE);
+        progress.show();
+
+
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
@@ -47,29 +59,27 @@ public class LoginFragment extends Fragment {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
 
-
-                            String name = user.getDisplayName();
-                            String email = user.getEmail();
-                            if(name == null) name="NULLA";
-                            if(email == null) email = "NULLA";
-
-                            Toast.makeText(getContext(), "You're logged in.",Toast.LENGTH_SHORT).show();
-
                             // taking logged user to MainActivity
                             Intent myIntent = new Intent(getActivity(), MainActivity.class);
+                            // passing the Auth ID to MainActivity
                             myIntent.putExtra("userID",user.getUid());
+                            // disabling animation for a better experience
+                            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            // starting MainActivity
                             getActivity().startActivity(myIntent);
-
                         } else {
                             // If sign in fails, display a message to the user.
-                            //Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
-
+                            // hiding progress bar
+                            progress.dismiss();
+                            // showing error
+                            Util.showErrorAlert(getContext(), Util.ERROR_DIALOG_TITLE, Util.ERROR_DIALOG_MESSAGE_FAILED_LOGIN);
                         }
 
                     }
                 });
     }
+
+
 
     @Override
     public View onCreateView(
@@ -97,13 +107,18 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.login_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 // getting email and password values
                 String emailValue = email.getText().toString().trim();
                 String passwordValue = password.getText().toString().trim();
 
-                // authenticating user
-                loginAccount(emailValue, passwordValue);
+                // validating form
+                if(Util.validateForm(emailValue, passwordValue)) {
+                    // if the form is ready, we try to login the user
+                    loginAccount(emailValue, passwordValue);
+                } else {
+                    // form is NOT valid, we show an alert
+                    Util.showErrorAlert(getContext(), Util.ERROR_DIALOG_TITLE, Util.ERROR_DIALOG_MESSAGE_VALIDATION);
+                }
             }
         });
 

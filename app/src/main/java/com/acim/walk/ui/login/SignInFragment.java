@@ -42,7 +42,6 @@ public class SignInFragment extends Fragment {
     // Firebase Firestore instance
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private static final String TAG = "EmailPassword";
 
     /**
      *
