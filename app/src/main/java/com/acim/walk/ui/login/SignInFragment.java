@@ -61,14 +61,13 @@ public class SignInFragment extends Fragment {
 
                             Toast.makeText(getContext(), "New user created.",Toast.LENGTH_SHORT).show();
 
-
-                            // this may be useful for some features
-                            //String userId = user.getUid();
-                            //storeUserId(userId);
-
-
-                            // taking new user to MainActivity
+                            // taking logged user to MainActivity
                             Intent myIntent = new Intent(getActivity(), MainActivity.class);
+                            // passing the Auth ID to MainActivity
+                            myIntent.putExtra("userID",user.getUid());
+                            // disabling animation for a better experience
+                            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            // starting MainActivity
                             getActivity().startActivity(myIntent);
 
                         } else {

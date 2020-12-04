@@ -18,17 +18,20 @@ import com.acim.walk.R;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
+
+import com.google.android.gms.nearby.messages.Strategy;
+import com.google.android.gms.nearby.messages.SubscribeOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import java.text.SimpleDateFormat;
 
-import org.w3c.dom.Text;
-
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 public class SearchMatchFragment extends Fragment {
 
@@ -37,6 +40,7 @@ public class SearchMatchFragment extends Fragment {
     private Message myMessage;
     private View root;
 
+    private String opponentID = null;
     private String userID = null;
 
     @Override
@@ -67,6 +71,7 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void onFound(Message message) {
                 System.out.println("ID RICEVUTO: " + new String(message.getContent()));
+                opponentID = new String(message.getContent());
             }
 
             @Override
@@ -78,6 +83,15 @@ public class SearchMatchFragment extends Fragment {
         // Create a message that contains user ID, used with Nearby publish/unpublish
         myMessage = new Message(userID.getBytes());
 
+        SubscribeOptions options = new SubscribeOptions.Builder()
+                .setStrategy(Strategy.BLE_ONLY)
+                .build();
+
+        // Methods to lets devices exchange small data. With publish, application sends a message and
+        // with subscribe, application will hear if some message arrives
+        Nearby.getMessagesClient(super.requireActivity()).publish(myMessage);
+        Nearby.getMessagesClient(super.requireActivity()).subscribe(myMessageListener, options);
+
         // Inflate the layout for this fragment
         return root;
     }
@@ -85,11 +99,6 @@ public class SearchMatchFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-        // Methods to lets devices exchange small data. With publish, application sends a message and
-        // with subscribe, application will hear if some message arrives
-        Nearby.getMessagesClient(super.requireActivity()).publish(myMessage);
-        Nearby.getMessagesClient(super.requireActivity()).subscribe(myMessageListener);
 
         Button startNewMatch = (Button) root.findViewById(R.id.startNewMatch_btn);
         startNewMatch.setOnClickListener(new View.OnClickListener() {
@@ -99,11 +108,14 @@ public class SearchMatchFragment extends Fragment {
                 FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
                 DocumentReference currentUserDocRef = dbFirestore.collection("match").document();
 
-                String otherOpponents = "OtherID";
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
+                String currentDateandTime = sdf.format(new Date());
 
                 Map<String, String> attributes = new HashMap<>();
                 attributes.put("id1", userID);
-                attributes.put("id2", otherOpponents);
+                attributes.put("id2", opponentID);
+                attributes.put("isOver", "N");
+                attributes.put("time_start", currentDateandTime);
 
                 currentUserDocRef
                         .set(attributes)
@@ -119,7 +131,6 @@ public class SearchMatchFragment extends Fragment {
                                 Log.w("TEST SCRITTURA", "Error writing document", e);
                             }
                         });
-
             }
         });
 
