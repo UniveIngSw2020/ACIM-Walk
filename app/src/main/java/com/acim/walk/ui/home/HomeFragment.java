@@ -117,33 +117,6 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
 
         DocumentReference currentUserDocRef = dbfirestore.collection("users").document("prova");
 
-/*
-        Map<String, String> temp = new HashMap<>();
-        temp.put("testTipoStringa", "OK!");
-        temp.put("Secondo", "OK2");*/
-
-        Map<String, String> temp = new HashMap<>();
-        temp.put("terzo", "OK3");
-
-        currentUserDocRef
-                .set(temp)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("TEST SCRITTURA", "DocumentSnapshot successfully written!");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("TEST SCRITTURA", "Error writing document", e);
-                    }
-                });
-
-
-
-        Log.i("LOG", db.toString());
-
         // read todays offset
         todayOffset = db.getSteps(Util.getToday());
 
