@@ -24,4 +24,5 @@
 
     <string name="userID">User ID:</string>
     <string name="startMatch">Walk!</string>
+    <string name="logout">Esci</string>
 </resources>

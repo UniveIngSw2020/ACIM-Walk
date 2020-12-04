@@ -96,8 +96,8 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                FirebaseFirestore dbDirestone = FirebaseFirestore.getInstance();
-                DocumentReference currentUserDocRef = dbDirestone.collection("match").document();
+                FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
+                DocumentReference currentUserDocRef = dbFirestore.collection("match").document();
 
                 String otherOpponents = "OtherID";
 

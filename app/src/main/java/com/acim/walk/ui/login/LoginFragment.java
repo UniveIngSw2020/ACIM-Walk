@@ -35,6 +35,7 @@ import androidx.navigation.fragment.NavHostFragment;
 public class LoginFragment extends Fragment {
     // Firebase Auth instance
     private FirebaseAuth mAuth;
+    private FirebaseUser user;
     /**
      *
      * Logs user
@@ -93,6 +94,19 @@ public class LoginFragment extends Fragment {
 
         // setting up Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+
+        // check is user is already logged in, if yes switch to home page
+        if(user != null){
+            // taking logged user to MainActivity
+            Intent myIntent = new Intent(getActivity(), MainActivity.class);
+            // passing the Auth ID to MainActivity
+            myIntent.putExtra("userID",user.getUid());
+            // disabling animation for a better experience
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            // starting MainActivity
+            getActivity().startActivity(myIntent);
+        }
 
         // referencing objects
         final EditText email = getView().findViewById(R.id.email_editext);
