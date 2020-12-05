@@ -22,7 +22,12 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
+    <!-- strings used for fragment_searchmatch -->
     <string name="userID">User ID:</string>
     <string name="startMatch">Walk!</string>
     <string name="logout">Esci</string>
+    <string name="setTime">Durata della partita</string>
+
+    <!-- strings used for fragment_newmatch -->
+    <string name="newmatchStepsCounter">Numero di passsi effettuati:</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.acim.walk.ui.searchmatch;
 
+import android.icu.text.SymbolTable;
 import android.util.Log;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -37,7 +39,7 @@ public class SearchMatchViewModel extends ViewModel {
         return mText;
     }
 
-    public void createMatch(String userId, List<String> opponentsIds){
+    public void createMatch(String userId, List<String> opponentsIds, String gameTime){
         DocumentReference currentUserDocRef = db.collection("match").document();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
@@ -71,4 +73,19 @@ public class SearchMatchViewModel extends ViewModel {
                 });
     }
 
+    // Function that set the correct string that contains the timer
+    public int gameTimeInMilliseconds(EditText gameTime) {
+        String time = String.valueOf(gameTime.getText());
+        int timeInMillis = 0;
+
+        String[] times = time.split(":");
+
+        timeInMillis = (Integer.parseInt(times[0]) * 60);
+
+        if(times.length != 1) {
+            timeInMillis += Integer.parseInt(times[1]);
+        }
+
+        return timeInMillis * 1000;
+    }
 }

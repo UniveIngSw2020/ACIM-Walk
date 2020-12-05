@@ -9,15 +9,20 @@ import androidx.fragment.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Intent;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+
 import android.telephony.SmsMessage;
 
 import com.acim.walk.ui.home.HomeViewModel;
+import com.acim.walk.ui.newmatch.NewmatchFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.nearby.messages.MessagesClient;
@@ -58,10 +63,11 @@ public class SearchMatchFragment extends Fragment {
 
     private MessageListener idsListener;
     private Message userIdMessage;
-    private View root;
 
     private ArrayList<String> opponentsIds = new ArrayList<>();
     private String userId = null;
+
+    private long timeInMillis = 10000;
 
     private final SubscribeOptions options = new SubscribeOptions.Builder()
             .setStrategy(Strategy.DEFAULT)
@@ -70,8 +76,6 @@ public class SearchMatchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
 
         // Create a message listener, used with Nearby subscribe/unsubscribe
         idsListener = new MessageListener() {
@@ -97,8 +101,7 @@ public class SearchMatchFragment extends Fragment {
         searchMatchViewModel =
                 new ViewModelProvider(this).get(SearchMatchViewModel.class);
 
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        root = inflater.inflate(R.layout.fragment_searchmatch, container, false);
+        View root = inflater.inflate(R.layout.fragment_searchmatch, container, false);
 
         userIdTxt = root.findViewById(R.id.userID_text);
         startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
@@ -106,13 +109,22 @@ public class SearchMatchFragment extends Fragment {
         // Get userID from MainActivity function, getUserID()
         MainActivity activity = (MainActivity)getActivity();
         userId = activity != null ? activity.getUserID() : "NaN";
+
         publish(userId);
         // Show on screen own user ID
         userIdTxt.setText(userId);
 
-
         startMatchBtn.setOnClickListener(x -> {
-            searchMatchViewModel.createMatch(userId, opponentsIds);
+
+            EditText gameTime = root.findViewById(R.id.gameDuration_time);
+            timeInMillis = searchMatchViewModel.gameTimeInMilliseconds(gameTime);
+
+            searchMatchViewModel.createMatch(userId, opponentsIds, String.valueOf(gameTime.getText()));
+
+            // Go to match page
+            NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+            NavController navController = navHostFragment.getNavController();
+            navController.navigate(R.id.nav_newmatch);
         });
 
         return root;
@@ -169,5 +181,4 @@ public class SearchMatchFragment extends Fragment {
         Log.i("SC:", "Unsubscribing...");
         Nearby.getMessagesClient(getActivity()).unsubscribe(idsListener);
     }
-
 }

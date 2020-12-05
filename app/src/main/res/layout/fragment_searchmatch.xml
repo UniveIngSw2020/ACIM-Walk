@@ -14,19 +14,19 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:textAlignment="center"
-        android:textSize="24sp"
+        android:textSize="21sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/TextShowUserId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/userID"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="18sp"
+        android:textSize="21sp"
         app:layout_constraintBottom_toTopOf="@+id/userID_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,11 +38,32 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:background="#000000"
         android:text="@string/startMatch"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userID_text" />
+
+    <EditText
+        android:id="@+id/gameDuration_time"
+        android:layout_width="130dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:inputType="time"
+        app:layout_constraintBottom_toTopOf="@+id/startNewMatch_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userID_text" />
+
+    <TextView
+        android:id="@+id/textSetTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/setTime"
+        android:textSize="21sp"
+        app:layout_constraintBottom_toTopOf="@+id/startNewMatch_btn"
+        app:layout_constraintEnd_toStartOf="@+id/gameDuration_time"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userID_text" />
 

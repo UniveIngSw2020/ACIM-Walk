@@ -11,9 +11,6 @@
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/action_nav_home_to_nav_newmatch"
-            app:destination="@id/nav_newmatch" />
-        <action
             android:id="@+id/action_nav_home_to_search_opponent_layout"
             app:destination="@id/search_opponent_layout" />
     </fragment>
@@ -23,7 +20,11 @@
         android:id="@+id/search_opponent_layout"
         android:name="com.acim.walk.ui.searchmatch.SearchMatchFragment"
         android:label="@string/menu_searchmatch"
-        tools:layout="@layout/fragment_searchmatch" />
+        tools:layout="@layout/fragment_searchmatch" >
+        <action
+            android:id="@+id/action_search_opponent_layout_to_nav_newmatch"
+            app:destination="@id/nav_newmatch" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_newmatch"
