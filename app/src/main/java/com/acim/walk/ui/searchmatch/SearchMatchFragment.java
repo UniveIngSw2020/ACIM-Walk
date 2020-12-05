@@ -1,10 +1,18 @@
 package com.acim.walk.ui.searchmatch;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import android.app.PendingIntent;
+import android.content.Intent;
+import androidx.lifecycle.ViewModelProvider;
+import android.telephony.SmsMessage;
 
+import com.acim.walk.ui.home.HomeViewModel;
+import com.google.android.gms.common.api.GoogleApiClient;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +20,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.google.android.gms.nearby.messages.MessagesClient;
+import com.google.android.gms.nearby.messages.MessagesOptions;
+import com.google.android.gms.nearby.messages.NearbyPermissions;
+import com.google.android.gms.nearby.messages.PublishCallback;
+import com.google.android.gms.nearby.messages.PublishOptions;
+import com.google.android.gms.nearby.messages.StatusCallback;
+import com.google.android.gms.nearby.messages.SubscribeCallback;
+import com.google.android.gms.tasks.Task;
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.google.android.gms.nearby.Nearby;
@@ -28,12 +43,15 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.SimpleDateFormat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class SearchMatchFragment extends Fragment {
+
+    private SearchMatchViewModel searchMatchViewModel;
 
     private TextView userIdTxt;
     private Button startMatchBtn;
@@ -42,7 +60,7 @@ public class SearchMatchFragment extends Fragment {
     private Message userIdMessage;
     private View root;
 
-    private String opponentId = null;
+    private ArrayList<String> opponentsIds = new ArrayList<>();
     private String userId = null;
 
     private final SubscribeOptions options = new SubscribeOptions.Builder()
@@ -54,17 +72,19 @@ public class SearchMatchFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
 
+
         // Create a message listener, used with Nearby subscribe/unsubscribe
         idsListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
                 System.out.println("ID RICEVUTO: " + new String(message.getContent()));
-                opponentId = new String(message.getContent());
+                opponentsIds.add(new String(message.getContent()));
             }
 
             @Override
             public void onLost(Message message) {
                 System.out.println("ERROR: " + new String(message.getContent()));
+                opponentsIds.add(new String(message.getContent()));
             }
         };
         subscribe();
@@ -74,7 +94,10 @@ public class SearchMatchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        searchMatchViewModel =
+                new ViewModelProvider(this).get(SearchMatchViewModel.class);
 
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
         root = inflater.inflate(R.layout.fragment_searchmatch, container, false);
 
         userIdTxt = root.findViewById(R.id.userID_text);
@@ -87,41 +110,9 @@ public class SearchMatchFragment extends Fragment {
         // Show on screen own user ID
         userIdTxt.setText(userId);
 
-        // Create a message that contains user ID, used with Nearby publish/unpublish
-        userIdMessage = new Message(userId.getBytes());
 
         startMatchBtn.setOnClickListener(x -> {
-            userIdMessage = new Message(userId.getBytes());
-            Nearby.getMessagesClient(getActivity()).publish(userIdMessage);
-
-
-            FirebaseFirestore dbFirestore = FirebaseFirestore.getInstance();
-            DocumentReference currentUserDocRef = dbFirestore.collection("match").document();
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
-            String currentDateandTime = sdf.format(new Date());
-
-            Map<String, String> attributes = new HashMap<>();
-            attributes.put("id1", userId);
-            attributes.put("id2", opponentId);
-            attributes.put("isOver", "N");
-            attributes.put("time_start", currentDateandTime);
-
-            currentUserDocRef
-                    .set(attributes)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("TEST SCRITTURA", "DocumentSnapshot successfully written!");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("TEST SCRITTURA", "Error writing document", e);
-                        }
-                    });
-
+            searchMatchViewModel.createMatch(userId, opponentsIds);
         });
 
         return root;
