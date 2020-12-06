@@ -38,7 +38,7 @@
 
         <meta-data
             android:name="com.google.android.nearby.messages.API_KEY"
-            android:value="AIzaSyBmi4Zim_ckNyceCwplUY7jwac4vQG8ns4" />
+            android:value="AIzaSyAAtVs3hAMFYS-V-vXcfV89_EwPGBw62qE" />
 
 
         <receiver android:name=".BootReceiver">

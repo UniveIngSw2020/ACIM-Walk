@@ -21,8 +21,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.nearby.messages.MessagesClient;
@@ -46,6 +48,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -64,8 +72,16 @@ public class SearchMatchFragment extends Fragment {
     private MessageListener idsListener;
     private Message userIdMessage;
 
+    // listview reference
+    private ListView opponentsList;
+    // list view data source
+    private ArrayAdapter<String> adapter;
+
     private ArrayList<String> opponentsIds = new ArrayList<>();
+    private ArrayList<String> opponentsEmails = new ArrayList<>();
     private String userId = null;
+    // user's email
+    private String userEmail = null;
 
     private long timeInMillis = 10000;
 
@@ -82,7 +98,44 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void onFound(Message message) {
                 System.out.println("ID RICEVUTO: " + new String(message.getContent()));
-                opponentsIds.add(new String(message.getContent()));
+
+
+                /*
+                *
+                * the JSON string will be something like:
+                * {"userId":"TuUU5TvJC6MgcBuagjYkNFIAOk82","userEmail":"mr@mail.com"}
+                * so here we convert the string to a JSON object
+                *
+                * */
+                JSONObject receivedObject = null;
+                try {
+                    // converting string to JSON object
+                    receivedObject = new JSONObject(new String(message.getContent()));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                // now we have a JSON object, we just need to access the values we need
+                String receivedId = null;
+                String receivedEmail = null;
+                try {
+                    // getting access to the values of the JSON object
+                    receivedId = receivedObject.getString("userId");
+                    receivedEmail = receivedObject.getString("userEmail");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                // checking if we have already received this message
+                if(!opponentsIds.contains(receivedId)) {
+                    // new opponent found
+                    opponentsIds.add(receivedId);
+                    opponentsEmails.add(receivedEmail);
+                    // new data is available for the listview to display
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -106,11 +159,33 @@ public class SearchMatchFragment extends Fragment {
         userIdTxt = root.findViewById(R.id.userID_text);
         startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
 
-        // Get userID from MainActivity function, getUserID()
+
+        // setting up listview
+        opponentsList = (ListView) root.findViewById(R.id.opponents_list);
+        // setting up listview adapter
+        adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, opponentsEmails);
+        // appending data source to listview
+        opponentsList.setAdapter(adapter);
+
+
+
+        // Get userID and userEmail from MainActivity function, getUserID(), getUserEmail()
         MainActivity activity = (MainActivity)getActivity();
         userId = activity != null ? activity.getUserID() : "NaN";
+        userEmail = activity != null ? activity.getUserEmail() : "NaN";
 
-        publish(userId);
+        // this JSON object will store all user's info
+        JSONObject userInfo = new JSONObject();
+        try {
+            userInfo.put("userId", userId);
+            userInfo.put("userEmail", userEmail);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // sending JSON object to nearby devices
+        publish(userInfo.toString());
         // Show on screen own user ID
         userIdTxt.setText(userId);
 

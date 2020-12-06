@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -98,6 +99,20 @@ public class Util {
         progress.setCancelable(false);
 
         return progress;
+    }
+
+
+    /**
+     *
+     * prints a Toast
+     *
+     * @param context
+     * @param message
+     * @param isDurationShort TRUE -> toast disappears quickly, FALSE -> disappears NOT so quickly
+     */
+    public static void toast(Context context, String message, boolean isDurationShort) {
+        int TOAST_DURATION = isDurationShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG;
+        Toast.makeText(context, message, TOAST_DURATION).show();
     }
 
 

@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
 
     private AppBarConfiguration mAppBarConfiguration;
     private String userID = "";
+    private String userEmail = " ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             userID = extras.getString("userID");
+            userEmail = extras.getString("userEmail");
         }
 
         setContentView(R.layout.activity_main);
@@ -60,9 +62,12 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
 
     }
 
-    public String getUserID() {
-        return userID;
-    }
+
+    /*
+    * these 2 methods will be used later in different fragments to get user's data
+    * */
+    public String getUserID() { return userID; }
+    public String getUserEmail() { return userEmail; }
 
     @Override
     public boolean onSupportNavigateUp() {
