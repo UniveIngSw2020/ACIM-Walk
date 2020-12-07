@@ -17,6 +17,9 @@ import android.telephony.SmsMessage;
 import com.acim.walk.ui.home.HomeViewModel;
 import com.acim.walk.ui.newmatch.NewmatchFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -159,6 +162,7 @@ public class SearchMatchFragment extends Fragment {
         userIdTxt = root.findViewById(R.id.userID_text);
         startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
 
+        startMatchBtn.setEnabled(false);
 
         // setting up listview
         opponentsList = (ListView) root.findViewById(R.id.opponents_list);
@@ -167,8 +171,6 @@ public class SearchMatchFragment extends Fragment {
                 android.R.layout.simple_list_item_1, android.R.id.text1, opponentsEmails);
         // appending data source to listview
         opponentsList.setAdapter(adapter);
-
-
 
         // Get userID and userEmail from MainActivity function, getUserID(), getUserEmail()
         MainActivity activity = (MainActivity)getActivity();
@@ -196,6 +198,10 @@ public class SearchMatchFragment extends Fragment {
 
             searchMatchViewModel.createMatch(userId, opponentsIds, String.valueOf(gameTime.getText()));
 
+            // Send timer to NewMatchFragment
+            MainActivity main = (MainActivity) getActivity();
+            main.passTimeInMillis(timeInMillis);
+
             // Go to match page
             NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
             NavController navController = navHostFragment.getNavController();
@@ -209,15 +215,35 @@ public class SearchMatchFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        Nearby.getMessagesClient(getActivity()).publish(userIdMessage);
-        Nearby.getMessagesClient(getActivity()).subscribe(idsListener);
+        // Method used to check if user has insert a duration for his game
+        EditText gameTime = getActivity().findViewById(R.id.gameDuration_time);
+        gameTime.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.toString().trim().length() == 0) {
+                    startMatchBtn.setEnabled(false);
+                } else {
+                    startMatchBtn.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     @Override
     public void onStop() {
         // Close the methods publish and subscribe, so close Nearby function
-        Nearby.getMessagesClient(getActivity()).unpublish(userIdMessage);
-        Nearby.getMessagesClient(getActivity()).unsubscribe(idsListener);
+        unpublish();
+        unsubscribe();
 
         super.onStop();
     }

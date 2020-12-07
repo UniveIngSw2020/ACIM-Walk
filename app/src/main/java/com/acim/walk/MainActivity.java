@@ -12,11 +12,13 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 
+import com.acim.walk.ui.newmatch.NewmatchFragment;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     private AppBarConfiguration mAppBarConfiguration;
     private String userID = "";
     private String userEmail = " ";
+
+    private long timesInMillis;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,13 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
 
     }
 
+    public void passTimeInMillis(long time) {
+        timesInMillis = time;
+    }
+
+    public long getTimesInMillis() {
+        return timesInMillis;
+    }
 
     /*
     * these 2 methods will be used later in different fragments to get user's data
