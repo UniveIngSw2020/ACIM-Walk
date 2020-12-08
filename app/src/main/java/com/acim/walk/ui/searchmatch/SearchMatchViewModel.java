@@ -5,16 +5,23 @@ import android.util.Log;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.acim.walk.DTO.UserDTO;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Transaction;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,25 +46,24 @@ public class SearchMatchViewModel extends ViewModel {
         return mText;
     }
 
-    public void createMatch(String userId, List<String> opponentsIds, String gameTime){
-        DocumentReference currentUserDocRef = db.collection("match").document();
+    public void createMatch(Collection<UserDTO> participants, String gameTime) {
+
+        final DocumentReference matchesDocRef = db.collection("match").document();
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault());
         String currentDateandTime = sdf.format(new Date());
+        ArrayList<UserDTO>participantsList = new ArrayList<>(participants);
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("id1", userId);
-        int i = 2;
-        for(String id:opponentsIds){
-            attributes.put(String.format("id%d", i), id);
-            Log.d("SC: ", String.format("id%d %s", i, id));
-            i++;
-        }
-
+        attributes.put("participants", participantsList);
         attributes.put("isOver", false);
         attributes.put("time_start", currentDateandTime);
 
-        currentUserDocRef
+        //TODO: transazione con inserimento dell'id partita su ciascun utente del db
+        //transaction.set(matchesDocRef,attributes);
+
+        matchesDocRef
                 .set(attributes)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -71,6 +77,8 @@ public class SearchMatchViewModel extends ViewModel {
                         Log.w("TEST SCRITTURA", "Error writing document", e);
                     }
                 });
+
+
     }
 
     // Function that set the correct string that contains the timer
@@ -82,7 +90,7 @@ public class SearchMatchViewModel extends ViewModel {
 
         timeInMillis = (Integer.parseInt(times[0]) * 60);
 
-        if(times.length != 1) {
+        if (times.length != 1) {
             timeInMillis += Integer.parseInt(times[1]);
         }
 

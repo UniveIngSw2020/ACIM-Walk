@@ -14,6 +14,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.telephony.SmsMessage;
 
+import com.acim.walk.DTO.UserDTO;
 import com.acim.walk.ui.home.HomeViewModel;
 import com.acim.walk.ui.newmatch.NewmatchFragment;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -51,6 +52,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.auth.User;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -62,8 +64,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SearchMatchFragment extends Fragment {
 
@@ -80,8 +85,10 @@ public class SearchMatchFragment extends Fragment {
     // list view data source
     private ArrayAdapter<String> adapter;
 
-    private ArrayList<String> opponentsIds = new ArrayList<>();
-    private ArrayList<String> opponentsEmails = new ArrayList<>();
+    private HashSet<UserDTO> opponents = new HashSet<>();;
+
+    //private ArrayList<String> opponentsIds = new ArrayList<>();
+    //private ArrayList<String> opponentsEmails = new ArrayList<>();
     private String userId = null;
     // user's email
     private String userEmail = null;
@@ -120,35 +127,40 @@ public class SearchMatchFragment extends Fragment {
 
 
                 // now we have a JSON object, we just need to access the values we need
-                String receivedId = null;
-                String receivedEmail = null;
+                String receivedId = "";
+                String receivedEmail = "";
+                String receivedUsername = "";
+                Integer receivedSteps = 0;
+                UserDTO receivedUser = null;
                 try {
                     // getting access to the values of the JSON object
                     receivedId = receivedObject.getString("userId");
                     receivedEmail = receivedObject.getString("userEmail");
+                    receivedUsername = receivedObject.getString("username");
+                    receivedSteps = receivedObject.getInt("userSteps");
+                    receivedUser = new UserDTO(receivedId, receivedEmail, receivedUsername, receivedSteps);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
+                opponents.add(receivedUser);
+                /*
                 // checking if we have already received this message
-                if(!opponentsIds.contains(receivedId)) {
+                if(!opponents.contains(receivedUser)) {
                     // new opponent found
-                    opponentsIds.add(receivedId);
-                    opponentsEmails.add(receivedEmail);
+                    opponents.add(receivedUser);
                     // new data is available for the listview to display
                     adapter.notifyDataSetChanged();
-                }
+                }*/
             }
 
             @Override
             public void onLost(Message message) {
                 System.out.println("ERROR: " + new String(message.getContent()));
-                opponentsIds.add(new String(message.getContent()));
+                //opponentsIds.add(new String(message.getContent()));
             }
         };
         subscribe();
-
     }
 
     @Override
@@ -159,29 +171,39 @@ public class SearchMatchFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_searchmatch, container, false);
 
+        // Get userID and userEmail from MainActivity function, getUserID(), getUserEmail()
+        MainActivity activity = (MainActivity)getActivity();
+        userId = activity != null ? activity.getUserID() : "NaN";
+        userEmail = activity != null ? activity.getUserEmail() : "NaN";
+
         userIdTxt = root.findViewById(R.id.userID_text);
         startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
 
         startMatchBtn.setEnabled(false);
 
+        opponents.add(new UserDTO(userEmail, userId, "", 0));
+
+        // setting up arguments to pass to listview
+        ArrayList<String> userList = new ArrayList<>();
+        for(UserDTO user : opponents){
+            userList.add(user.email);
+        }
         // setting up listview
         opponentsList = (ListView) root.findViewById(R.id.opponents_list);
         // setting up listview adapter
         adapter = new ArrayAdapter<String>(getContext(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, opponentsEmails);
+                android.R.layout.simple_list_item_1, android.R.id.text1, userList);
         // appending data source to listview
         opponentsList.setAdapter(adapter);
-
-        // Get userID and userEmail from MainActivity function, getUserID(), getUserEmail()
-        MainActivity activity = (MainActivity)getActivity();
-        userId = activity != null ? activity.getUserID() : "NaN";
-        userEmail = activity != null ? activity.getUserEmail() : "NaN";
 
         // this JSON object will store all user's info
         JSONObject userInfo = new JSONObject();
         try {
             userInfo.put("userId", userId);
             userInfo.put("userEmail", userEmail);
+            //TODO: add username
+            userInfo.put("username", "");
+            userInfo.put("stepsNumber", 0);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -196,7 +218,7 @@ public class SearchMatchFragment extends Fragment {
             EditText gameTime = root.findViewById(R.id.gameDuration_time);
             timeInMillis = searchMatchViewModel.gameTimeInMilliseconds(gameTime);
 
-            searchMatchViewModel.createMatch(userId, opponentsIds, String.valueOf(gameTime.getText()));
+            searchMatchViewModel.createMatch(opponents, String.valueOf(gameTime.getText()));
 
             // Send timer to NewMatchFragment
             MainActivity main = (MainActivity) getActivity();
