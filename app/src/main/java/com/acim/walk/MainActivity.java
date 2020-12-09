@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     private AppBarConfiguration mAppBarConfiguration;
     private String userID = "";
     private String userEmail = " ";
+    private String username = "";
 
     private long timesInMillis;
 
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         if (extras != null) {
             userID = extras.getString("userID");
             userEmail = extras.getString("userEmail");
+            username = extras.getString("username");
         }
 
         setContentView(R.layout.activity_main);
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     * */
     public String getUserID() { return userID; }
     public String getUserEmail() { return userEmail; }
+    public String getUsername() { return  username; }
 
     @Override
     public boolean onSupportNavigateUp() {

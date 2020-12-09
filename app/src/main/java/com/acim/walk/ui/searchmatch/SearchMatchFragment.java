@@ -1,23 +1,13 @@
 package com.acim.walk.ui.searchmatch;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import android.app.PendingIntent;
-import android.content.Intent;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.telephony.SmsMessage;
-
-import com.acim.walk.DTO.UserDTO;
-import com.acim.walk.ui.home.HomeViewModel;
-import com.acim.walk.ui.newmatch.NewmatchFragment;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.acim.walk.Model.User;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -31,14 +21,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.gms.nearby.messages.MessagesClient;
-import com.google.android.gms.nearby.messages.MessagesOptions;
-import com.google.android.gms.nearby.messages.NearbyPermissions;
-import com.google.android.gms.nearby.messages.PublishCallback;
-import com.google.android.gms.nearby.messages.PublishOptions;
-import com.google.android.gms.nearby.messages.StatusCallback;
-import com.google.android.gms.nearby.messages.SubscribeCallback;
-import com.google.android.gms.tasks.Task;
+
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.google.android.gms.nearby.Nearby;
@@ -47,30 +30,22 @@ import com.google.android.gms.nearby.messages.MessageListener;
 
 import com.google.android.gms.nearby.messages.Strategy;
 import com.google.android.gms.nearby.messages.SubscribeOptions;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SearchMatchFragment extends Fragment {
+
+    private final String TAG = "SearchMatchFragment";
+
+    private final String JSON_ID = "userId";
+    private final String JSON_EMAIL = "userEmail";
+    private final String JSON_USERNAME ="username";
 
     private SearchMatchViewModel searchMatchViewModel;
 
@@ -85,12 +60,10 @@ public class SearchMatchFragment extends Fragment {
     // list view data source
     private ArrayAdapter<String> adapter;
 
-    private HashSet<UserDTO> opponents = new HashSet<>();;
+    private HashSet<User> participants = new HashSet<>();;
 
-    //private ArrayList<String> opponentsIds = new ArrayList<>();
-    //private ArrayList<String> opponentsEmails = new ArrayList<>();
     private String userId = null;
-    // user's email
+    private String username = null;
     private String userEmail = null;
 
     private long timeInMillis = 10000;
@@ -125,33 +98,23 @@ public class SearchMatchFragment extends Fragment {
                     e.printStackTrace();
                 }
 
-
                 // now we have a JSON object, we just need to access the values we need
                 String receivedId = "";
                 String receivedEmail = "";
                 String receivedUsername = "";
-                Integer receivedSteps = 0;
-                UserDTO receivedUser = null;
+                User receivedUser = null;
                 try {
                     // getting access to the values of the JSON object
-                    receivedId = receivedObject.getString("userId");
-                    receivedEmail = receivedObject.getString("userEmail");
-                    receivedUsername = receivedObject.getString("username");
-                    receivedSteps = receivedObject.getInt("userSteps");
-                    receivedUser = new UserDTO(receivedId, receivedEmail, receivedUsername, receivedSteps);
+                    receivedId = receivedObject.getString(JSON_ID);
+                    receivedEmail = receivedObject.getString(JSON_EMAIL);
+                    receivedUsername = receivedObject.getString(JSON_USERNAME);
+                    receivedUser = new User(receivedId, receivedEmail, receivedUsername);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                opponents.add(receivedUser);
-                /*
-                // checking if we have already received this message
-                if(!opponents.contains(receivedUser)) {
-                    // new opponent found
-                    opponents.add(receivedUser);
-                    // new data is available for the listview to display
-                    adapter.notifyDataSetChanged();
-                }*/
+                // non need to check if already present because participants is a set
+                participants.add(receivedUser);
             }
 
             @Override
@@ -175,18 +138,20 @@ public class SearchMatchFragment extends Fragment {
         MainActivity activity = (MainActivity)getActivity();
         userId = activity != null ? activity.getUserID() : "NaN";
         userEmail = activity != null ? activity.getUserEmail() : "NaN";
+        username = activity != null ? activity.getUsername() : "NaN";
+        User currentUser = new User(userEmail, userId, username, 0);
 
         userIdTxt = root.findViewById(R.id.userID_text);
         startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
 
         startMatchBtn.setEnabled(false);
 
-        opponents.add(new UserDTO(userEmail, userId, "", 0));
+        participants.add(currentUser);
 
         // setting up arguments to pass to listview
         ArrayList<String> userList = new ArrayList<>();
-        for(UserDTO user : opponents){
-            userList.add(user.email);
+        for(User user : participants){
+            userList.add(user.getUsername());
         }
         // setting up listview
         opponentsList = (ListView) root.findViewById(R.id.opponents_list);
@@ -199,11 +164,9 @@ public class SearchMatchFragment extends Fragment {
         // this JSON object will store all user's info
         JSONObject userInfo = new JSONObject();
         try {
-            userInfo.put("userId", userId);
-            userInfo.put("userEmail", userEmail);
-            //TODO: add username
-            userInfo.put("username", "");
-            userInfo.put("stepsNumber", 0);
+            userInfo.put(JSON_ID, userId);
+            userInfo.put(JSON_EMAIL, userEmail);
+            userInfo.put(JSON_USERNAME, username);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -218,7 +181,9 @@ public class SearchMatchFragment extends Fragment {
             EditText gameTime = root.findViewById(R.id.gameDuration_time);
             timeInMillis = searchMatchViewModel.gameTimeInMilliseconds(gameTime);
 
-            searchMatchViewModel.createMatch(opponents, String.valueOf(gameTime.getText()));
+            //TODO: convert "timeInMills" to Date object
+            Date endDate = null;
+            searchMatchViewModel.createMatch(participants, endDate);
 
             // Send timer to NewMatchFragment
             MainActivity main = (MainActivity) getActivity();
@@ -272,7 +237,7 @@ public class SearchMatchFragment extends Fragment {
 
 
     public void publish(String message) {
-        Log.i("SC: ", "Publishing: " + message);
+        Log.i(TAG, "Publishing: " + message);
 
         userIdMessage = new Message(message.getBytes());
         Nearby.getMessagesClient(getActivity()).publish(userIdMessage);
@@ -281,7 +246,7 @@ public class SearchMatchFragment extends Fragment {
 
     // Only use if someone wants to unpublish a message from the chatroom
     public void unpublish() {
-        Log.i("SC: ", "Unpublishing...");
+        Log.i(TAG, "Unpublishing...");
         if (userIdMessage != null) {
             Nearby.getMessagesClient(getActivity()).unpublish(userIdMessage);
             userIdMessage = null;
@@ -289,7 +254,7 @@ public class SearchMatchFragment extends Fragment {
     }
 
     private void subscribe(){
-        Log.i("SC:", "Subscribing...");
+        Log.i(TAG, "Subscribing...");
 
         Nearby.getMessagesClient(getActivity()).subscribe(idsListener, options)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -301,7 +266,7 @@ public class SearchMatchFragment extends Fragment {
 
     }
     private void unsubscribe() {
-        Log.i("SC:", "Unsubscribing...");
+        Log.i(TAG, "Unsubscribing...");
         Nearby.getMessagesClient(getActivity()).unsubscribe(idsListener);
     }
 }

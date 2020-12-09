@@ -104,6 +104,8 @@ public class LoginFragment extends Fragment {
             myIntent.putExtra("userID",user.getUid());
             // passing the user's email to MainActivity
             myIntent.putExtra("userEmail",user.getEmail());
+            // passing the user's username to the MainActivity
+            myIntent.putExtra("username", user.getDisplayName());
             // disabling animation for a better experience
             myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             // starting MainActivity

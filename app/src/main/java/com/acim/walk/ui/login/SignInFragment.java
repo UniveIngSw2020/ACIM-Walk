@@ -2,6 +2,7 @@ package com.acim.walk.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.acim.walk.MainActivity;
+import com.acim.walk.Model.User;
 import com.acim.walk.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -17,8 +19,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +41,8 @@ import androidx.navigation.fragment.NavHostFragment;
 
 public class SignInFragment extends Fragment {
 
+    private final String TAG = "SignInFragment";
+
     // Firebase Auth instance
     private FirebaseAuth mAuth;
     // Firebase Firestore instance
@@ -49,8 +55,9 @@ public class SignInFragment extends Fragment {
      *
      * @param email email
      * @param password password
+     * @param username username (DisplayName)
      */
-    private void createAccount(String email, String password) {
+    private void createAccount(String email, String password, String username) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
@@ -59,12 +66,46 @@ public class SignInFragment extends Fragment {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
 
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(username)
+                                    .build();
+
+                            user.updateProfile(profileUpdates)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Log.d(TAG, "User profile updated.");
+                                            }
+                                        }
+                                    });
+
+
+                            // Get a new write batch
+                            WriteBatch batch = db.batch();
+
+                            // Set up the object values for the user
+                            DocumentReference userRef = db.collection("users").document(user.getUid());
+                            batch.set(userRef, new User(email, user.getUid(), username));
+
+                            // Commit the batch
+                            batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Log.d(TAG, "User added to 'users' collection!");
+                                }
+                            });
+
+
                             Toast.makeText(getContext(), "New user created.",Toast.LENGTH_SHORT).show();
 
                             // taking logged user to MainActivity
                             Intent myIntent = new Intent(getActivity(), MainActivity.class);
                             // passing the Auth ID to MainActivity
                             myIntent.putExtra("userID",user.getUid());
+                            myIntent.putExtra("userEmail",user.getEmail());
+                            // passing the user's username to the MainActivity
+                            myIntent.putExtra("username", user.getDisplayName());
                             // disabling animation for a better experience
                             myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             // starting MainActivity
@@ -79,43 +120,6 @@ public class SignInFragment extends Fragment {
                     }
                 });
     }
-
-
-    /**
-     *
-     * stores the ID of the Firebase Auth user in the Firebase Firestore docs
-     *
-     * @param userId id generated from the Firebase Auth user
-     */
-    private void storeUserId(String userId) {
-        Map<String, Object> user = new HashMap<>();
-        user.put("authId", userId);
-
-        // Add a new document with a generated ID
-        db.collection("users")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        //Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                        Toast.makeText(getContext(), "AGGIUNTO", Toast.LENGTH_SHORT).show();
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        //Log.w(TAG, "Error adding document", e);
-                        Toast.makeText(getContext(), "NON AGGIUNTO", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-
-
-
-
-
 
 
     @Override
@@ -149,11 +153,10 @@ public class SignInFragment extends Fragment {
                 // getting email and password values
                 String emailValue = email.getText().toString().trim();
                 String passwordValue = password.getText().toString().trim();
-                //String usernameValue = username.getText().toString().trim();
+                String usernameValue = username.getText().toString().trim();
 
                 // creating new Firebase user
-                createAccount(emailValue, passwordValue);
-                //storeUsername(usernameValue);
+                createAccount(emailValue, passwordValue, usernameValue);
             }
         });
 
