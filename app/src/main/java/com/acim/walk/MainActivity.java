@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
                                 Object matchId = document.getData().get("matchId");
                                 // if user has a match going on, we send him to the recap fragment
                                 if(matchId != null)
-                                    navController.navigate(R.id.action_nav_home_to_new_match_layout);
+                                    navController.navigate(R.id.action_nav_home_to_match_recap_layout);
                             }
                         } else {
                             // TODO: do something here to handle error

@@ -16,10 +16,15 @@
 
         <!-- this route is needed to send the user to MatchRecapFragment when ha has a match going on -->
         <action
-            android:id="@+id/action_nav_home_to_new_match_layout"
-            app:destination="@id/nav_newmatch" />
+            android:id="@+id/action_nav_home_to_match_recap_layout"
+            app:destination="@id/nav_matchrecap" />
     </fragment>
 
+    <fragment
+        android:id="@+id/nav_matchrecap"
+        android:name="com.acim.walk.ui.matchrecap.MatchRecapFragment"
+        android:label="Match recap"
+        tools:layout="@layout/match_recap_fragment" />
 
     <fragment
         android:id="@+id/search_opponent_layout"
