@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         NavigationUI.setupWithNavController(navigationView, navController);
 
 
-
         /*
          * checking if user has an actual match going on.
          * first we get the user's data from Firebase.

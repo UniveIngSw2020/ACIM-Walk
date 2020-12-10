@@ -28,15 +28,13 @@ public class NewmatchFragment extends Fragment {
     private TextView stepsText;
 
     private CountDownTimer countDownTimer;
-    private long timeInMillis; // 10 min in millis
+    private long timeInMillis = 60000; // 10 min in millis
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_newmatch, container, false);
 
-        MainActivity main = (MainActivity) getActivity();
-        timeInMillis = main.getTimesInMillis(); // Retrieve timer from the previous fragment
 
         newMatchViewModel =
                 new ViewModelProvider(this).get(NewMatchViewModel.class);

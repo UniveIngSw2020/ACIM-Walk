@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.acim.walk.Model.Match;
 import com.acim.walk.Model.User;
+import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -17,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.type.DateTime;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
 
 public class SearchMatchViewModel extends ViewModel {
 
@@ -75,6 +78,17 @@ public class SearchMatchViewModel extends ViewModel {
             }
         });
 
+    }
+
+    public Date getEndDate(EditText gameTime) {
+        Date currentDate = Calendar.getInstance().getTime();
+        long timer = currentDate.getTime();
+
+        timer += gameTimeInMilliseconds(gameTime);
+
+        currentDate.setTime(timer);
+
+        return currentDate;
     }
 
     // Function that set the correct string that contains the timer

@@ -66,8 +66,6 @@ public class SearchMatchFragment extends Fragment {
     private String username = null;
     private String userEmail = null;
 
-    private long timeInMillis = 10000;
-
     private final SubscribeOptions options = new SubscribeOptions.Builder()
             .setStrategy(Strategy.DEFAULT)
             .build();
@@ -179,15 +177,10 @@ public class SearchMatchFragment extends Fragment {
         startMatchBtn.setOnClickListener(x -> {
 
             EditText gameTime = root.findViewById(R.id.gameDuration_time);
-            timeInMillis = searchMatchViewModel.gameTimeInMilliseconds(gameTime);
 
             //TODO: convert "timeInMills" to Date object
-            Date endDate = null;
+            Date endDate = searchMatchViewModel.getEndDate(gameTime);
             searchMatchViewModel.createMatch(participants, endDate);
-
-            // Send timer to NewMatchFragment
-            MainActivity main = (MainActivity) getActivity();
-            main.passTimeInMillis(timeInMillis);
 
             // Go to match page
             NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
