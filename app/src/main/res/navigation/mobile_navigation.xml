@@ -13,6 +13,11 @@
         <action
             android:id="@+id/action_nav_home_to_search_opponent_layout"
             app:destination="@id/search_opponent_layout" />
+
+        <!-- this route is needed to send the user to MatchRecapFragment when ha has a match going on -->
+        <action
+            android:id="@+id/action_nav_home_to_new_match_layout"
+            app:destination="@id/nav_newmatch" />
     </fragment>
 
 

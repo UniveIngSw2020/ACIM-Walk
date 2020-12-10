@@ -43,17 +43,16 @@ public class Util {
      *
      * Validates form for AuthActivity's LoginFragment and SignInFragment
      *
-     * @param email
-     * @param password
+     * @param strings some strings
      * @return true if both email and password are NOT empty, false otherwise
      */
-    public static boolean validateForm(String email, String password) {
-
-        // if either one of the strings is empty
-        if(email.isEmpty() || password.isEmpty())
-            return false;
-
-        // both strings are NOT empty
+    public static boolean validateForm(String ...strings) {
+        // if one string is empty the form is invalid
+        for(String s : strings) {
+            if(s.isEmpty())
+                return false;
+        }
+        // all strings are NOT empty, form is valid
         return true;
     }
 
@@ -97,7 +96,6 @@ public class Util {
         progress.setMessage(message);
         // disable dismiss by tapping outside of the dialog
         progress.setCancelable(false);
-
         return progress;
     }
 
@@ -120,8 +118,9 @@ public class Util {
 
     // these are the messages that will be shown to display some errors to the users
     public static String ERROR_DIALOG_TITLE = "Errore Autenticazione";
-    public static String ERROR_DIALOG_MESSAGE_VALIDATION = "Compilare entrambi i campi";
+    public static String ERROR_DIALOG_MESSAGE_VALIDATION = "Compilare tutti i campi";
     public static String ERROR_DIALOG_MESSAGE_FAILED_LOGIN = "Autenticazione fallita. Riprovare";
+    public static String ERROR_DIALOG_MESSAGE_FAILED_SIGNUP = "Registrazione fallita. Riprovare";
 
     public static String PROGRESS_DIALOG_TITLE = "Caricamento";
     public static String PROGRESS_DIALOG_MESSAGE = "Si prega di attendere...";

@@ -1,5 +1,6 @@
 package com.acim.walk.ui.login;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import com.acim.walk.MainActivity;
 import com.acim.walk.Model.User;
 import com.acim.walk.R;
+import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,6 +60,12 @@ public class SignInFragment extends Fragment {
      * @param username username (DisplayName)
      */
     private void createAccount(String email, String password, String username) {
+
+        // displays progress bar while user waits for the device to comunicate w/ Firebase
+        ProgressDialog progress = Util.createProgressBar(getContext(), Util.PROGRESS_DIALOG_TITLE, Util.PROGRESS_DIALOG_MESSAGE);
+        progress.show();
+
+
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
@@ -113,8 +121,10 @@ public class SignInFragment extends Fragment {
 
                         } else {
                             // If sign in fails, display a message to the user.
-                            //Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(getContext(), "Error while creating a new user.", Toast.LENGTH_SHORT).show();
+                            // hiding progress bar
+                            progress.dismiss();
+                            // showing error
+                            Util.showErrorAlert(getContext(), Util.ERROR_DIALOG_TITLE, Util.ERROR_DIALOG_MESSAGE_FAILED_SIGNUP);
                         }
 
                     }
@@ -155,8 +165,14 @@ public class SignInFragment extends Fragment {
                 String passwordValue = password.getText().toString().trim();
                 String usernameValue = username.getText().toString().trim();
 
-                // creating new Firebase user
-                createAccount(emailValue, passwordValue, usernameValue);
+                // validating form
+                if(Util.validateForm(emailValue, passwordValue)) {
+                    // if the form is ready, we create a new Firebase user
+                    createAccount(emailValue, passwordValue, usernameValue);
+                } else {
+                    // form is NOT valid, we show an alert
+                    Util.showErrorAlert(getContext(), Util.ERROR_DIALOG_TITLE, Util.ERROR_DIALOG_MESSAGE_VALIDATION);
+                }
             }
         });
 
