@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
@@ -117,6 +119,16 @@ public class MatchRecapFragment extends Fragment {
                 } else {
                     // TODO: do something here to handle error
                 }
+            }
+        });
+
+        showRanking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Go to ranking page
+                NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+                NavController navController = navHostFragment.getNavController();
+                navController.navigate(R.id.nav_show_ranking);
             }
         });
 

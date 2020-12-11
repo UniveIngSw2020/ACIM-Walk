@@ -31,4 +31,7 @@
 
     <!-- strings used for fragment_newmatch -->
     <string name="newmatchStepsCounter">Numero di passsi effettuati:</string>
+
+    <!-- strings used for fragment_show_ranking -->
+    <string name="rankingText">Classifica</string>
 </resources>

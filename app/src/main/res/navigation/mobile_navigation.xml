@@ -24,7 +24,18 @@
         android:id="@+id/nav_matchrecap"
         android:name="com.acim.walk.ui.matchrecap.MatchRecapFragment"
         android:label="Match recap"
-        tools:layout="@layout/match_recap_fragment" />
+        tools:layout="@layout/match_recap_fragment" >
+        <action
+            android:id="@+id/action_nav_matchrecap_to_nav_show_ranking"
+            app:destination="@id/nav_show_ranking" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_show_ranking"
+        android:name="com.acim.walk.ui.matchrecap.ShowRankingFragment"
+        android:label="Show Ranking"
+        tools:layout="@layout/fragment_show_ranking"
+        />
 
     <fragment
         android:id="@+id/search_opponent_layout"
