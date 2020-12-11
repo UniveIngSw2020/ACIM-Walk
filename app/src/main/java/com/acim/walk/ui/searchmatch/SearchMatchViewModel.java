@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
@@ -51,6 +52,10 @@ public class SearchMatchViewModel extends ViewModel {
     }
 
     public void createMatch(Collection<User> participants, Date endDate) {
+
+        for(User u : participants){
+            Log.d(TAG, u.getUserId());
+        }
 
         // Retrieves starting moment of the match
         Date startDate = Calendar.getInstance().getTime();

@@ -20,10 +20,13 @@ import com.acim.walk.ui.newmatch.NewmatchFragment;
 import com.acim.walk.ui.searchmatch.SearchMatchFragment;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -42,6 +45,8 @@ import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity /*implements SensorEventListener2*/ {
 
+    private final String TAG = "MainActivity";
+
     private AppBarConfiguration mAppBarConfiguration;
     private String userID = "";
     private String userEmail = " ";
@@ -50,6 +55,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     // Firebase Firestore instance
     // we need it to find out if the user is partecipating to a game
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     private long timesInMillis;
 
@@ -98,6 +104,16 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         ProgressDialog progress = Util.createProgressBar(this, Util.PROGRESS_DIALOG_TITLE, Util.PROGRESS_DIALOG_MESSAGE);
         progress.show();
 
+        DocumentReference userDocRef = db.collection("users").document(userID);
+        if(userDocRef == null){
+            progress.dismiss();
+            // user account not found
+            Intent myIntent = new Intent(MainActivity.this, AuthActivity.class);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            // starting AuthActivity
+            MainActivity.this.startActivity(myIntent);
+        }
+
         // checking if the user has some games going on
         db.collection("users")
                 .whereEqualTo("userId", userID)
@@ -117,6 +133,12 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
                             }
                         } else {
                             // TODO: do something here to handle error
+                            progress.dismiss();
+                            // user account not found
+                            Intent myIntent = new Intent(MainActivity.this, AuthActivity.class);
+                            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            // starting AuthActivity
+                            MainActivity.this.startActivity(myIntent);
                         }
                     }
                 });

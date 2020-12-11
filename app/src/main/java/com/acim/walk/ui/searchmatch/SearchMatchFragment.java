@@ -57,6 +57,7 @@ public class SearchMatchFragment extends Fragment {
 
     // listview reference
     private ListView opponentsList;
+    ArrayList<String> userList = new ArrayList<>();
     // list view data source
     private ArrayAdapter<String> adapter;
 
@@ -106,13 +107,22 @@ public class SearchMatchFragment extends Fragment {
                     receivedId = receivedObject.getString(JSON_ID);
                     receivedEmail = receivedObject.getString(JSON_EMAIL);
                     receivedUsername = receivedObject.getString(JSON_USERNAME);
-                    receivedUser = new User(receivedId, receivedEmail, receivedUsername);
+                    receivedUser = new User(receivedEmail, receivedId, receivedUsername);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // non need to check if already present because participants is a set
-                participants.add(receivedUser);
+                Boolean toAdd = true;
+                for(User user : participants){
+                    if(user.getUserId().equals(receivedId)){
+                        toAdd = false;
+                    }
+                }
+                if(toAdd){
+                    participants.add(receivedUser);
+                    userList.add(receivedUsername);
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -147,7 +157,6 @@ public class SearchMatchFragment extends Fragment {
         participants.add(currentUser);
 
         // setting up arguments to pass to listview
-        ArrayList<String> userList = new ArrayList<>();
         for(User user : participants){
             userList.add(user.getUsername());
         }
@@ -178,7 +187,6 @@ public class SearchMatchFragment extends Fragment {
 
             EditText gameTime = root.findViewById(R.id.gameDuration_time);
 
-            //TODO: convert "timeInMills" to Date object
             Date endDate = searchMatchViewModel.getEndDate(gameTime);
             searchMatchViewModel.createMatch(participants, endDate);
 
