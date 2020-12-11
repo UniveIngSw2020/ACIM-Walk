@@ -17,6 +17,14 @@ import android.widget.TextView;
 
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Date;
 
 public class MatchRecapFragment extends Fragment {
 
@@ -29,6 +37,8 @@ public class MatchRecapFragment extends Fragment {
     private String userId;
     private long timeInMillis;
 
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     private CountDownTimer countDownTimer;
 
     public static MatchRecapFragment newInstance() {
@@ -40,28 +50,82 @@ public class MatchRecapFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.match_recap_fragment, container, false);
 
+        mViewModel = new ViewModelProvider(this).get(MatchRecapViewModel.class);
+
         // Set global variables
         timer_txt = root.findViewById(R.id.timer_txt);
         showRanking = root.findViewById(R.id.ranking_btn);
         leaveMatch = root.findViewById(R.id.abandonMatch_btn);
 
-        MainActivity main = new MainActivity();
-        userId = main.getUserID();
+        MainActivity activity = (MainActivity)getActivity();
+        userId = activity.getUserID();
 
         System.out.println("UID UTENTE: " + userId);
 
         // Retrieve from db the remaining time in ms, then show on timer_txt
-        timeInMillis = mViewModel.getTimeFromDb(userId);
+        Task<QuerySnapshot> userRes = db.collection("users")
+                .whereEqualTo("userId", userId)
+                .get();
 
-        startCountDown();
+        userRes.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+
+                        // getting matchId property from the user
+                        String matchId = (String) document.getData().get("matchId");
+
+                        // User is not playing any game
+                        if (matchId == null) return;
+
+                        // Read data from matches table now
+                        Task<QuerySnapshot> matchRes = db.collection("matches")
+                                .whereEqualTo("matchId",matchId)
+                                .get();
+
+                        matchRes.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                        // Retrieve start and end dates used to calculate game duration
+                                        Timestamp end = (Timestamp) document.getData().get("endDate");
+                                        Timestamp now = new Timestamp(new Date());
+
+                                        System.out.println("END: " + end.getSeconds());
+                                        System.out.println("NOW: " + now.getSeconds());
+
+                                        long remainingTime = end.getSeconds() - now.getSeconds();
+
+                                        System.out.println("REMAINING TIME: " + remainingTime);
+
+                                        // Using these two var, calculate timer
+                                        timeInMillis = remainingTime * 1000;
+
+                                        System.out.println("TIME IN MILLIS: " + timeInMillis);
+                                        startCountDown();
+                                    }
+                                } else {
+                                    // TODO: do something here to handle error
+                                }
+                            }
+                        });
+
+                    }
+                } else {
+                    // TODO: do something here to handle error
+                }
+            }
+        });
+
         return root;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(MatchRecapViewModel.class);
-        // TODO: Use the ViewModel
     }
 
     private void startCountDown() {

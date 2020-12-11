@@ -90,8 +90,8 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
             public void onClick(View v) {
                 NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                 NavController navController = navHostFragment.getNavController();
+                // navController.navigate(R.id.nav_matchrecap);
                 navController.navigate(R.id.nav_newmatch);
-
             }
         });
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
