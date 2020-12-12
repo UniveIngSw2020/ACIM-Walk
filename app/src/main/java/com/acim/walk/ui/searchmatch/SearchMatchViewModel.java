@@ -51,6 +51,7 @@ public class SearchMatchViewModel extends ViewModel {
         return mText;
     }
 
+    /*
     public void createMatch(Collection<User> participants, Date endDate) {
 
         for(User u : participants){
@@ -111,4 +112,6 @@ public class SearchMatchViewModel extends ViewModel {
 
         return timeInMillis * 1000;
     }
+
+    */
 }

@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
 
     private AppBarConfiguration mAppBarConfiguration;
     private String userID = "";
-    private String userEmail = " ";
+    private String userEmail = "";
     private String username = "";
 
     // Firebase Firestore instance

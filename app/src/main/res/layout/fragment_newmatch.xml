@@ -2,41 +2,100 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/search_opponent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.newmatch.NewmatchFragment">
 
+
     <TextView
-        android:id="@+id/stepsCounter_text"
+        android:id="@+id/textShowUserId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/userID"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="21sp"
+        app:layout_constraintBottom_toTopOf="@+id/userID_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/opponents_list" />
+
+    <TextView
+        android:id="@+id/textShowUserId2"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/opponentsID"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="21sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/userID_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:textAlignment="center"
-        android:textSize="32sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/opponents_list" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/newmatchStepsCounter"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/stepsCounter_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/text_countdown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10:00"
-        android:textSize="50sp"
-        app:layout_constraintBottom_toTopOf="@+id/stepsCounter_text"
+    <ListView
+        android:id="@+id/opponents_list"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textShowUserId2" />
+
+    <Button
+        android:id="@+id/startNewMatch_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/startMatch"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userID_text"
+        app:layout_constraintVertical_bias="0.811" />
+
+    <EditText
+        android:id="@+id/gameDuration_time"
+        android:layout_width="130dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="32dp"
+        android:ems="10"
+        android:inputType="time"
+        app:layout_constraintBottom_toTopOf="@+id/startNewMatch_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userID_text"
+        app:layout_constraintVertical_bias="0.776" />
+
+    <TextView
+        android:id="@+id/textSetTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/setTime"
+        android:textSize="21sp"
+        app:layout_constraintBottom_toTopOf="@+id/startNewMatch_btn"
+        app:layout_constraintEnd_toStartOf="@+id/gameDuration_time"
+        app:layout_constraintHorizontal_bias="0.511"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userID_text"
+        app:layout_constraintVertical_bias="0.788" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

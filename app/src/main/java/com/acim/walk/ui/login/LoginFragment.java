@@ -62,6 +62,10 @@ public class LoginFragment extends Fragment {
                             Intent myIntent = new Intent(getActivity(), MainActivity.class);
                             // passing the Auth ID to MainActivity
                             myIntent.putExtra("userID",user.getUid());
+                            myIntent.putExtra("userEmail",user.getEmail());
+                            // passing the user's username to the MainActivity
+                            myIntent.putExtra("username", user.getDisplayName());
+                            // disabling animation for a better experience
                             // disabling animation for a better experience
                             myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             // starting MainActivity

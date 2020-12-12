@@ -1,8 +1,6 @@
 package com.acim.walk.ui.home;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -19,40 +17,28 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.acim.walk.Database;
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
-import com.acim.walk.ui.newmatch.NewmatchFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class HomeFragment extends Fragment implements SensorEventListener2 {
 
     private HomeViewModel homeViewModel;
     private TextView currentStepsTxt;
-    private Button newMatchBtn, searchOpponent;
+    private Button newMatchBtn, searchMatchBtn;
     FirebaseFirestore dbfirestore = FirebaseFirestore.getInstance();
     private int todayOffset, total_start, since_boot, total_days;
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
@@ -74,9 +60,9 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
 
         currentStepsTxt = root.findViewById(R.id.text_home);
         newMatchBtn = root.findViewById(R.id.newMatchBtn);
-        searchOpponent = root.findViewById(R.id.searchMatchBtn);
+        searchMatchBtn = root.findViewById(R.id.searchMatchBtn);
 
-        searchOpponent.setOnClickListener(new View.OnClickListener() {
+        searchMatchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
