@@ -132,8 +132,20 @@ public class MatchRecapFragment extends Fragment {
             }
         });
 
+
+        leaveMatch.setOnClickListener(new View.OnClickListener() {
+            MainActivity activity = (MainActivity)getActivity();
+            @Override
+            public void onClick(View view) {
+                LeaveMatchDialog leaveMatchDialog = new LeaveMatchDialog();
+                leaveMatchDialog.show(activity.getSupportFragmentManager(), "");
+            }
+        });
+
         return root;
     }
+
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

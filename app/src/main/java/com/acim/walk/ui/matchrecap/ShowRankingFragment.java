@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,8 +50,6 @@ public class ShowRankingFragment extends Fragment {
      */
     ArrayList<User> users = new ArrayList<>();
 
-
-
     public ShowRankingFragment() {
         // Required empty public constructor
     }
@@ -65,6 +64,7 @@ public class ShowRankingFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_show_ranking, container, false);
+
 
         MainActivity main = (MainActivity) getActivity();
         userId = main.getUserID();

@@ -60,7 +60,7 @@ public class NewmatchFragment extends Fragment {
     // list view data source
     private ArrayAdapter<String> adapter;
 
-    private HashSet<User> participants = new HashSet<>();;
+    private HashSet<User> participants = new HashSet<>();
 
     private String userId = null;
     private String username = null;
