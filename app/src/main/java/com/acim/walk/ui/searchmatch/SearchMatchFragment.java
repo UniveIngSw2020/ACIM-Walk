@@ -9,15 +9,11 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.acim.walk.Model.User;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,8 +33,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class SearchMatchFragment extends Fragment {
 
@@ -47,7 +47,6 @@ public class SearchMatchFragment extends Fragment {
     private final String JSON_ID = "userId";
     private final String JSON_EMAIL = "userEmail";
     private final String JSON_USERNAME = "username";
-    private final String JSON_MATCH_ID = "matchId";
 
     private SearchMatchViewModel searchMatchViewModel;
 
@@ -55,6 +54,7 @@ public class SearchMatchFragment extends Fragment {
 
     private MessageListener idsListener;
     private Message userIdMessage;
+    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     // listview reference
     private ListView opponentsList;
@@ -68,11 +68,12 @@ public class SearchMatchFragment extends Fragment {
     private String userId = null;
     private String username = null;
     private String userEmail = null;
-    private String matchId = null;
+
 
     private final SubscribeOptions options = new SubscribeOptions.Builder()
             .setStrategy(Strategy.DEFAULT)
             .build();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -116,16 +117,7 @@ public class SearchMatchFragment extends Fragment {
                     }
 
                 } catch (JSONException e) {
-                    try {
-                        // the received message contains the new match id
-                        receivedObject = new JSONObject(new String(message.getContent()));
-                        matchId = receivedObject.getString(JSON_MATCH_ID);
-                        Log.d(TAG, "JSON CATCH");
-                        Util.toast(getActivity(), "JSON CATCH", true);
-                        matchIdReceived();
-                    } catch (JSONException a) {
 
-                    }
                 }
             }
 
@@ -186,7 +178,48 @@ public class SearchMatchFragment extends Fragment {
         // Show on screen own user ID
         userIdTxt.setText(userId);
 
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                if(searchMatchViewModel.checkForMatchParticipation(userId)) {
+                    Log.d(TAG, "FIRED");
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+                            NavController navController = navHostFragment.getNavController();
+                            navController.navigate(R.id.nav_matchrecap);
+                        }
+                    });
+                }
+            }
+        }, 2, 2, TimeUnit.SECONDS);
+
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                if (searchMatchViewModel.checkForMatchParticipation(userId)) {
+                    Log.d(TAG, "FIRED");
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+                            NavController navController = navHostFragment.getNavController();
+                            navController.navigate(R.id.nav_matchrecap);
+                        }
+                    });
+                }
+            }
+        }, 2, 2, TimeUnit.SECONDS);
+
     }
 
     @Override
@@ -194,7 +227,7 @@ public class SearchMatchFragment extends Fragment {
         // Close the methods publish and subscribe, so close Nearby function
         unpublish();
         unsubscribe();
-
+        scheduler.shutdown();
         super.onStop();
     }
 
@@ -214,13 +247,6 @@ public class SearchMatchFragment extends Fragment {
         }
     }
 
-    private void matchIdReceived() {
-        Util.toast(getActivity(), "La partita è iniziata!", false);
-        // go to match recap page
-        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
-        navController.navigate(R.id.nav_matchrecap);
-    }
 
     private void subscribe() {
         Log.i(TAG, "Subscribing...");

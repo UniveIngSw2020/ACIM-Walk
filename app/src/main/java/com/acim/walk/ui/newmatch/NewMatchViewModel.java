@@ -11,9 +11,12 @@ import androidx.lifecycle.ViewModel;
 import com.acim.walk.Model.Match;
 import com.acim.walk.Model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
@@ -97,4 +100,5 @@ public class NewMatchViewModel extends ViewModel {
 
         return timeInMillis * 1000;
     }
+
 }

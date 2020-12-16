@@ -35,7 +35,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class NewmatchFragment extends Fragment {
 
@@ -43,7 +47,7 @@ public class NewmatchFragment extends Fragment {
 
     private final String JSON_USER_ID = "userId";
     private final String JSON_EMAIL = "userEmail";
-    private final String JSON_USERNAME ="username";
+    private final String JSON_USERNAME = "username";
     private final String JSON_MATCH_ID = "matchId";
 
     private NewMatchViewModel newMatchViewModel;
@@ -52,7 +56,7 @@ public class NewmatchFragment extends Fragment {
     private Button startMatchBtn;
 
     private MessageListener idsListener;
-    private Message userIdMessage;
+    private Message matchMessage;
 
     // listview reference
     private ListView opponentsList;
@@ -61,11 +65,13 @@ public class NewmatchFragment extends Fragment {
     private ArrayAdapter<String> adapter;
 
     private HashSet<User> participants = new HashSet<>();
+    private HashMap<String, Boolean> participantsConfirmation = new HashMap<>();
 
     private String userId = null;
     private String username = null;
     private String userEmail = null;
     private Boolean canHost = true;
+    private Boolean acceptResponses = false;
 
     private final SubscribeOptions options = new SubscribeOptions.Builder()
             .setStrategy(Strategy.DEFAULT)
@@ -112,8 +118,14 @@ public class NewmatchFragment extends Fragment {
                     }
 
                 } catch (JSONException e) {
-                    // the received message contains the new match id
-                    canHost = false;
+                    try {
+                        receivedObject = new JSONObject(new String(message.getContent()));
+                        String receivedId = receivedObject.getString(JSON_USER_ID);
+                        participantsConfirmation.put(receivedId, true);
+                    } catch (JSONException ex) {
+                        // the received message contains the new match id
+                        canHost = false;
+                    }
                 }
             }
 
@@ -135,9 +147,10 @@ public class NewmatchFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_newmatch, container, false);
 
         // Get userID and userEmail from MainActivity function, getUserID(), getUserEmail()
-        MainActivity activity = (MainActivity)getActivity();
+        MainActivity activity = (MainActivity) getActivity();
         userId = activity != null ? activity.getUserID() : "NaN";
         userEmail = activity != null ? activity.getUserEmail() : "NaN";
+        username = activity != null ? activity.getUsername() : "NaN";
         User currentUser = new User(userEmail, userId, username, 0);
 
         userIdTxt = root.findViewById(R.id.userID_text);
@@ -149,7 +162,7 @@ public class NewmatchFragment extends Fragment {
 
         // setting up arguments to pass to listview
         userList.clear();
-        for(User user : participants){
+        for (User user : participants) {
             userList.add(user.getUsername());
         }
         // setting up listview
@@ -177,7 +190,7 @@ public class NewmatchFragment extends Fragment {
         userIdTxt.setText(userId);
 
         startMatchBtn.setOnClickListener(x -> {
-            if(canHost) {
+            if (canHost) {
                 EditText gameTime = root.findViewById(R.id.gameDuration_time);
 
                 Date endDate = newMatchViewModel.getEndDate(gameTime);
@@ -191,14 +204,17 @@ public class NewmatchFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                unpublish();
                 publish(matchInfo.toString());
+
 
                 // go to match recap page
                 NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                 NavController navController = navHostFragment.getNavController();
                 navController.navigate(R.id.nav_matchrecap);
-            }
-            else{
+
+
+            } else {
                 Util.toast(getActivity(), "Qualcuno sta cercando di creare una gara con gli stessi partecipanti!", false);
             }
         });
@@ -220,7 +236,7 @@ public class NewmatchFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.toString().trim().length() == 0) {
+                if (charSequence.toString().trim().length() == 0) {
                     startMatchBtn.setEnabled(false);
                 } else {
                     startMatchBtn.setEnabled(true);
@@ -237,7 +253,7 @@ public class NewmatchFragment extends Fragment {
     @Override
     public void onStop() {
         // Close the methods publish and subscribe, so close Nearby function
-        //unpublish();
+        unpublish();
         unsubscribe();
         super.onStop();
     }
@@ -246,21 +262,21 @@ public class NewmatchFragment extends Fragment {
     public void publish(String message) {
         Log.i(TAG, "Publishing: " + message);
 
-        userIdMessage = new Message(message.getBytes());
-        Nearby.getMessagesClient(getActivity()).publish(userIdMessage);
+        matchMessage = new Message(message.getBytes());
+        Nearby.getMessagesClient(getActivity()).publish(matchMessage);
 
     }
 
     // Only use if someone wants to unpublish a message from the chatroom
     public void unpublish() {
         Log.i(TAG, "Unpublishing...");
-        if (userIdMessage != null) {
-            Nearby.getMessagesClient(getActivity()).unpublish(userIdMessage);
-            userIdMessage = null;
+        if (matchMessage != null) {
+            Nearby.getMessagesClient(getActivity()).unpublish(matchMessage);
+            matchMessage = null;
         }
     }
 
-    private void subscribe(){
+    private void subscribe() {
         Log.i(TAG, "Subscribing...");
 
         Nearby.getMessagesClient(getActivity()).subscribe(idsListener, options)
@@ -272,8 +288,18 @@ public class NewmatchFragment extends Fragment {
                 });
 
     }
+
     private void unsubscribe() {
         Log.i(TAG, "Unsubscribing...");
         Nearby.getMessagesClient(getActivity()).unsubscribe(idsListener);
+    }
+
+    private Boolean checkResponses() {
+        for (Boolean b : participantsConfirmation.values()) {
+            if (!b) {
+                return false;
+            }
+        }
+        return true;
     }
 }
