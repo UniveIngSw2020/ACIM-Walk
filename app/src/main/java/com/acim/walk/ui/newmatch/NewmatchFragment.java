@@ -1,5 +1,6 @@
 package com.acim.walk.ui.newmatch;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,6 +23,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.acim.walk.MainActivity;
 import com.acim.walk.Model.User;
 import com.acim.walk.R;
+import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
@@ -209,6 +211,7 @@ public class NewmatchFragment extends Fragment {
 
 
                 // go to match recap page
+                getActivity().startService(new Intent(getActivity(), SensorListener.class));
                 NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                 NavController navController = navHostFragment.getNavController();
                 navController.navigate(R.id.nav_matchrecap);

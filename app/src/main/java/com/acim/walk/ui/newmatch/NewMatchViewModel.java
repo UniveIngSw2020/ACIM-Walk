@@ -71,6 +71,7 @@ public class NewMatchViewModel extends ViewModel {
                 Log.d(TAG, "Match created and users updated!");
             }
         });
+
         return newMatchRef.getId();
     }
 

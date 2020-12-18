@@ -1,5 +1,6 @@
 package com.acim.walk.ui.searchmatch;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
+import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
@@ -183,7 +185,7 @@ public class SearchMatchFragment extends Fragment {
             public void run() {
                 if(searchMatchViewModel.checkForMatchParticipation(userId)) {
                     Log.d(TAG, "FIRED");
-
+                    getActivity().startService(new Intent(getActivity(), SensorListener.class));
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -208,6 +210,8 @@ public class SearchMatchFragment extends Fragment {
             public void run() {
                 if (searchMatchViewModel.checkForMatchParticipation(userId)) {
                     Log.d(TAG, "FIRED");
+                    //getActivity().startService(new Intent(getActivity(), SensorListener.class));
+                    scheduler.shutdown();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

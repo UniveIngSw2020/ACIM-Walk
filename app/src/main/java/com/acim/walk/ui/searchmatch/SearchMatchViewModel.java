@@ -39,6 +39,7 @@ public class SearchMatchViewModel extends ViewModel {
 
     private FirebaseFirestore db;
     private MutableLiveData<String> mText;
+    private Boolean hasMatch = false;
 
 
     public SearchMatchViewModel() {
@@ -53,7 +54,6 @@ public class SearchMatchViewModel extends ViewModel {
     }
 
     public Boolean checkForMatchParticipation(String userId){
-        final Boolean[] result = {false};
         DocumentReference userRef = db.collection("users").document(userId);
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -65,7 +65,7 @@ public class SearchMatchViewModel extends ViewModel {
                         if(userMatchIdObj != null && userMatchIdObj.toString() != null && userMatchIdObj.toString() != "")
                         {
                             Log.d(TAG, "ENTRA " + userMatchIdObj.toString());
-                            result[0] = true;
+                            hasMatch = true;
                         }
                     } else {
                         Log.d(TAG, "No such document");
@@ -75,7 +75,13 @@ public class SearchMatchViewModel extends ViewModel {
                 }
             }
         });
-        Log.d(TAG, "Ritorna true ");
-        return result[0];
+        return hasMatch;
+    }
+
+    public void setHasMatch(Boolean value){
+        this.hasMatch = value;
+    }
+    public Boolean getHasMatch(){
+        return hasMatch;
     }
 }
