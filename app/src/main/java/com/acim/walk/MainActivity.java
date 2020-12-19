@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_newmatch, R.id.nav_settings)
+                R.id.nav_home, R.id.nav_matchrecap, R.id.nav_settings)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
                                 Object matchId = document.getData().get("matchId");
                                 // if user has a match going on, we send him to the recap fragment
                                 if(matchId != null)
-                                    navController.navigate(R.id.action_nav_home_to_match_recap_layout);
+                                    navController.navigate(R.id.nav_matchrecap);
                             }
                         } else {
                             // TODO: do something here to handle error

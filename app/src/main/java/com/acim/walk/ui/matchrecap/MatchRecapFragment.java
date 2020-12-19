@@ -1,7 +1,10 @@
 package com.acim.walk.ui.matchrecap;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,30 +14,40 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
+import com.acim.walk.SensorListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.Date;
 
 public class MatchRecapFragment extends Fragment {
+
+    private final String TAG = "MatchRecapFragment";
 
     private MatchRecapViewModel mViewModel;
 
     private Button showRanking;
     private Button leaveMatch;
     private TextView timer_txt;
+    private TextView steps_txt;
 
     private String userId;
     private long timeInMillis;
@@ -48,6 +61,22 @@ public class MatchRecapFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState){
+
+        super.onCreate(savedInstanceState);
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button even
+                Log.d("BACKBUTTON", "Back button clicks");
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.match_recap_fragment, container, false);
@@ -55,6 +84,7 @@ public class MatchRecapFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(MatchRecapViewModel.class);
 
         // Set global variables
+        steps_txt = root.findViewById(R.id.steps_txt);
         timer_txt = root.findViewById(R.id.timer_txt);
         showRanking = root.findViewById(R.id.ranking_btn);
         leaveMatch = root.findViewById(R.id.abandonMatch_btn);
@@ -145,8 +175,6 @@ public class MatchRecapFragment extends Fragment {
         return root;
     }
 
-
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -162,7 +190,44 @@ public class MatchRecapFragment extends Fragment {
 
             @Override
             public void onFinish() {
+
                 timer_txt.setText("Time's over!");
+
+                // Remove user matchId, because he finish this match
+                db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()) {
+
+                                    WriteBatch batch = db.batch();
+                                    //Clear matchId reference on user document
+                                    DocumentReference userDoc = db.collection("users").document(userId);
+                                    batch.update(userDoc, "matchId", null);
+                                    batch.update(userDoc, "steps", 0);
+
+                                    // Commit the batch
+                                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Log.d(TAG, "User added to 'users' collection!");
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                        .putInt("pauseCount", 0).apply();
+                // Return to home
+                getActivity().stopService(new Intent(getActivity(), SensorListener.class));
+
+                // Return to home page
+                NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+                NavController navController = navHostFragment.getNavController();
+                navController.navigate(R.id.nav_home);
             }
         }.start();
     }

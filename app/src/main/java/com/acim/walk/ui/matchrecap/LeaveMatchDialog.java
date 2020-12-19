@@ -77,18 +77,19 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
 
                                                                 // deserializing [{}, .., {}] the collection of objects (users) from Firebase
                                                                 List<Map<String, Object>> tempUsers = (List<Map<String, Object>>) task.getResult().get("participants");
-
-                                                                // Create a new List that contains all the participants, except current user
                                                                 List<User> participants = new ArrayList<>();
 
-                                                                for (Map<String, Object> user : tempUsers) {
-                                                                    // Create an user and add to participants
-                                                                    if (!userId.equals(user.get("userId").toString())) {
-                                                                        String email = user.get("email").toString();
-                                                                        String id = user.get("userId").toString();
-                                                                        String username = user.get("username").toString();
-                                                                        int steps = Math.toIntExact((Long) user.get("steps"));
-                                                                        participants.add(new User(email,id,username,steps));
+                                                                // Create a new List that contains all the participants, except current user
+                                                                if (tempUsers != null) {
+                                                                    for (Map<String, Object> user : tempUsers) {
+                                                                        // Create an user and add to participants
+                                                                        if (!userId.equals(user.get("userId").toString())) {
+                                                                            String email = user.get("email").toString();
+                                                                            String id = user.get("userId").toString();
+                                                                            String username = user.get("username").toString();
+                                                                            int steps = Math.toIntExact((Long) user.get("steps"));
+                                                                            participants.add(new User(email,id,username,steps));
+                                                                        }
                                                                     }
                                                                 }
 

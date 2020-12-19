@@ -51,6 +51,7 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
         //First check if logged in user participates a match. If yes starts the service to enable sensor to count steps and to show notification
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();

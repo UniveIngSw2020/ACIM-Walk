@@ -37,11 +37,11 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
         android:layout_marginTop="30dp"
         android:text="Passi"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="21sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/timer_txt" />
 
@@ -51,31 +51,9 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
         android:layout_height="wrap_content"
         android:text="123"
         android:textSize="50sp"
-        android:layout_marginLeft="80dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Classifica"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="21sp"
-        android:layout_marginRight="80dp"
-        android:layout_marginTop="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timer_txt" />
-
-    <TextView
-        android:id="@+id/rankingPosition_txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="3°"
-        android:layout_marginRight="80dp"
-        android:textSize="50sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
 
     <Button
