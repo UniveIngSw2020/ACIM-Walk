@@ -209,9 +209,9 @@ public class NewmatchFragment extends Fragment {
                 unpublish();
                 publish(matchInfo.toString());
 
-
-                // go to match recap page
+                // start the service to count steps
                 getActivity().startService(new Intent(getActivity(), SensorListener.class));
+                // go to match recap page
                 NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                 NavController navController = navHostFragment.getNavController();
                 navController.navigate(R.id.nav_matchrecap);

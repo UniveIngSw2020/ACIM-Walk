@@ -46,8 +46,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
     private static long lastSaveTime;
 
     private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
-    private FirebaseFirestore dbContext = FirebaseFirestore.getInstance();
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private static FirebaseFirestore dbContext = FirebaseFirestore.getInstance();
+    private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     @Nullable
     @Override
@@ -104,6 +104,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
             lastSaveTime = System.currentTimeMillis();
             */
 
+            //TODO: transaction to update user's steps counter on match document
             DocumentReference userRef = dbContext.collection("users").document(mAuth.getUid());
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
@@ -143,6 +144,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
+        //TODO: fire only when a match has started (or when device boots and a match is ongoing)
         Log.i(TAG, "onStartCommand SERVICE");
         reRegisterSensor();
         registerBroadcastReceiver();
@@ -191,17 +193,38 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     public static Notification getNotification(final Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+        //SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+        /*
         Database db = Database.getInstance(context);
         int today_offset = db.getSteps(Util.getToday());
         if (steps == 0)
             steps = db.getCurrentSteps(); // use saved value if we haven't anything better
         db.close();
+        */
+        //TODO: check if the value of the step counter is correct
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        DocumentReference userRef = db.collection("users").document(mAuth.getUid());
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    if(task.getResult() != null){
+                        if(task.getResult().getLong("steps") != null){
+                            steps = task.getResult().getLong("steps").intValue();
+                        }
+                    }
+                }
+            }
+        });
+
+
         Notification.Builder notificationBuilder = getNotificationBuilder(context);
         if (steps > 0) {
-            notificationBuilder.setContentText(String.format("%d", (today_offset + steps)) )
+            notificationBuilder.setContentText(String.format("%d", (steps)) )
                     .setContentTitle("Passi");
         }
+
         notificationBuilder.setPriority(Notification.PRIORITY_MIN).setShowWhen(false)
                 .setContentIntent(PendingIntent
                         .getActivity(context, 0, new Intent(context, MainActivity.class),
@@ -216,7 +239,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
         NotificationChannel channel =
                 new NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_ID,
                         NotificationManager.IMPORTANCE_NONE);
-        channel.setImportance(NotificationManager.IMPORTANCE_MIN); // ignored by Android O ...
+        channel.setImportance(NotificationManager.IMPORTANCE_MIN);
         channel.enableLights(false);
         channel.enableVibration(false);
         channel.setBypassDnd(false);

@@ -184,8 +184,8 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void run() {
                 if(searchMatchViewModel.checkForMatchParticipation(userId)) {
-                    Log.d(TAG, "FIRED");
                     getActivity().startService(new Intent(getActivity(), SensorListener.class));
+                    scheduler.shutdown();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -209,8 +209,7 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void run() {
                 if (searchMatchViewModel.checkForMatchParticipation(userId)) {
-                    Log.d(TAG, "FIRED");
-                    //getActivity().startService(new Intent(getActivity(), SensorListener.class));
+                    getActivity().startService(new Intent(getActivity(), SensorListener.class));
                     scheduler.shutdown();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override

@@ -2,7 +2,9 @@ package com.acim.walk.ui.matchrecap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.acim.walk.MainActivity;
 import com.acim.walk.Model.User;
 import com.acim.walk.R;
+import com.acim.walk.SensorListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -62,7 +65,7 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                                             // Get matchId
                                             String matchId = (String) task.getResult().get("matchId");
 
-                                            // Retrieve match datas, delete user from participants and update match participants
+                                            // Retrieve match's data, delete user from participants and update match participants
                                             db.collection("matches")
                                                     .document(matchId)
                                                     .get()
@@ -94,6 +97,11 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                                                                 DocumentReference doc = db.collection("matches").document(matchId);
                                                                 batch.update(doc, "participants", participants);
 
+                                                                //Clear matchId reference on user document
+                                                                DocumentReference userDoc = db.collection("users").document(userId);
+                                                                batch.update(userDoc, "matchId", null);
+                                                                batch.update(userDoc, "steps", 0);
+
                                                                 // Commit the batch
                                                                 batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                     @Override
@@ -108,7 +116,10 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                                     }
                                 });
 
+                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                                .putInt("pauseCount", 0).apply();
                         // Return to home
+                        getActivity().stopService(new Intent(getActivity(), SensorListener.class));
                         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                         NavController navController = navHostFragment.getNavController();
                         navController.navigate(R.id.nav_home);

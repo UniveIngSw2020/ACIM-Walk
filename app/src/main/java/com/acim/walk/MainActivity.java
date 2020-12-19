@@ -71,6 +71,13 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
             userEmail = extras.getString("userEmail");
             username = extras.getString("username");
         }
+        else{
+            // Activity created from tap on notification
+            userID = mAuth.getUid();
+            userEmail = mAuth.getCurrentUser().getEmail();
+            username = mAuth.getCurrentUser().getDisplayName();
+            username = mAuth.getCurrentUser().getDisplayName();
+        }
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -103,6 +110,8 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         // displays progress bar while user waits for the device to comunicate w/ Firebase
         ProgressDialog progress = Util.createProgressBar(this, Util.PROGRESS_DIALOG_TITLE, Util.PROGRESS_DIALOG_MESSAGE);
         progress.show();
+
+        Log.d(TAG, "USER: " + userID);
 
         DocumentReference userDocRef = db.collection("users").document(userID);
         if(userDocRef == null){

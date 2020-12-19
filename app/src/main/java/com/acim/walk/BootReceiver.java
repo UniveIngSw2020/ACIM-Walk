@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
 
         SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+
 
         Database db = Database.getInstance(context);
 
@@ -26,6 +29,11 @@ public class BootReceiver extends BroadcastReceiver {
         db.saveCurrentSteps(0);
         db.close();
         prefs.edit().remove("correctShutdown").apply();
+
+        FirebaseFirestore dbf = FirebaseFirestore.getInstance();
+
+
+
 
         context.startForegroundService(new Intent(context, SensorListener.class));
 

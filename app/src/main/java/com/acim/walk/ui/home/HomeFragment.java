@@ -28,7 +28,11 @@ import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.NumberFormat;
@@ -47,7 +51,21 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
+        //First check if logged in user participates a match. If yes starts the service to enable sensor to count steps and to show notification
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        Task<DocumentSnapshot> useRef = db.collection("users").document(mAuth.getUid())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            if(task.getResult() != null && task.getResult().getString("matchId") != null && task.getResult().getString("matchId") != ""){
+                                getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
+                                Log.i("LOG", "Service started");
+                            }
+                        }
+                    }
+                });
         Log.i("LOG", "Service started");
     }
 
