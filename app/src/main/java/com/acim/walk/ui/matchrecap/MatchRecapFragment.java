@@ -16,6 +16,8 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,6 +29,7 @@ import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -74,7 +77,13 @@ public class MatchRecapFragment extends Fragment {
         };
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        // getting access to the menu
+        NavigationView nav = ((MainActivity)getActivity()).getNavigation();
+        // hiding Home option on this fragment
+        nav.getMenu().findItem(R.id.nav_home).setVisible(false);
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,

@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     private final String TAG = "MainActivity";
 
     private AppBarConfiguration mAppBarConfiguration;
+    private NavigationView navigationView;
     private String userID = "";
     private String userEmail = "";
     private String username = "";
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -168,6 +169,9 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     public String getUserID() { return userID; }
     public String getUserEmail() { return userEmail; }
     public String getUsername() { return  username; }
+
+    // needed to hide some menu's options in some fragments
+    public NavigationView getNavigation() { return navigationView; }
 
     @Override
     public boolean onSupportNavigateUp() {

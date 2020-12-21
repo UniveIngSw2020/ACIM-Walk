@@ -31,6 +31,7 @@ import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,9 +42,10 @@ import java.util.Locale;
 public class HomeFragment extends Fragment implements SensorEventListener2 {
 
     private HomeViewModel homeViewModel;
-    private TextView currentStepsTxt;
+    private TextView currentStepsTxt, userInfoTxt;
     private Button newMatchBtn, searchMatchBtn;
     FirebaseFirestore dbfirestore = FirebaseFirestore.getInstance();
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private int todayOffset, total_start, since_boot, total_days;
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
     private boolean showSteps = true;
@@ -67,7 +69,7 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
                         }
                     }
                 });
-        Log.i("LOG", "Service started");
+        //Log.i("LOG", "Service started");
     }
 
     @Override
@@ -78,8 +80,19 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         currentStepsTxt = root.findViewById(R.id.text_home);
+        userInfoTxt = root.findViewById(R.id.userInfoTxt);
         newMatchBtn = root.findViewById(R.id.newMatchBtn);
         searchMatchBtn = root.findViewById(R.id.searchMatchBtn);
+
+        // displaying user info
+        FirebaseUser user = mAuth.getCurrentUser();
+        // getting username from MainActivity method
+        String username = ((MainActivity)getActivity()).getUsername();
+        String text = user.getEmail() + "-" + username;
+        if(username == null)
+            text = user.getEmail();
+        userInfoTxt.setText(text);
+
 
         searchMatchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
