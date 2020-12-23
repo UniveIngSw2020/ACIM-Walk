@@ -55,6 +55,14 @@ public class MatchRecapFragment extends Fragment {
     private String userId;
     private long timeInMillis;
 
+    /*
+     * when the match is over, this will become TRUE
+     * it will be used for the 'leaveMatch' button
+     * if 'isOver' is TRUE, the user will be redirected to HOME because the match is ended/over
+     * if 'isOver' is FALSE, user will abandon the match, because it's not over yet
+     */
+    private boolean matchIsOver = false;
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private CountDownTimer countDownTimer;
@@ -176,8 +184,17 @@ public class MatchRecapFragment extends Fragment {
             MainActivity activity = (MainActivity)getActivity();
             @Override
             public void onClick(View view) {
-                LeaveMatchDialog leaveMatchDialog = new LeaveMatchDialog();
-                leaveMatchDialog.show(activity.getSupportFragmentManager(), "");
+                // if match is over, takes user back to home
+                if(matchIsOver) {
+                    NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+                    NavController navController = navHostFragment.getNavController();
+                    navController.navigate(R.id.nav_home);
+                }
+                // match is NOT over yet, user will leave the match
+                else {
+                    LeaveMatchDialog leaveMatchDialog = new LeaveMatchDialog();
+                    leaveMatchDialog.show(activity.getSupportFragmentManager(), "");
+                }
             }
         });
 
@@ -200,6 +217,13 @@ public class MatchRecapFragment extends Fragment {
             @Override
             public void onFinish() {
 
+                /*
+                 * timer finished: match is over.
+                 * the 'leave match' button will display now 'home', to redirect user to HOME
+                 */
+                matchIsOver = true;
+
+                leaveMatch.setText("Home");
                 timer_txt.setText("Time's over!");
 
                 // Remove user matchId, because he finish this match
@@ -228,15 +252,10 @@ public class MatchRecapFragment extends Fragment {
                             }
                         });
 
+                // stopping steps service
                 getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("pauseCount", 0).apply();
-                // Return to home
                 getActivity().stopService(new Intent(getActivity(), SensorListener.class));
-
-                // Return to home page
-                NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-                NavController navController = navHostFragment.getNavController();
-                navController.navigate(R.id.nav_home);
             }
         }.start();
     }
