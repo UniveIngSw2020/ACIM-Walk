@@ -112,62 +112,47 @@ public class MatchRecapFragment extends Fragment {
         System.out.println("UID UTENTE: " + userId);
 
         // Retrieve from db the remaining time in ms, then show on timer_txt
-        Task<QuerySnapshot> userRes = db.collection("users")
-                .whereEqualTo("userId", userId)
-                .get();
-
-        userRes.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        DocumentReference userRef = db.collection("users").document(userId);
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful() && task.getResult().exists()){
+                    // getting matchId property from the user
+                    String matchId = (String) task.getResult().getData().get("matchId");
 
-                        // getting matchId property from the user
-                        String matchId = (String) document.getData().get("matchId");
+                    // User is not playing any game
+                    if (matchId == null) return;
 
-                        // User is not playing any game
-                        if (matchId == null) return;
+                    // Read data from matches table now
+                    DocumentReference matchRef = db.collection("matches").document(matchId);
+                    matchRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful() && task.getResult().exists()){
 
-                        // Read data from matches table now
-                        Task<QuerySnapshot> matchRes = db.collection("matches")
-                                .whereEqualTo("matchId",matchId)
-                                .get();
+                                // Retrieve start and end dates used to calculate game duration
+                                Timestamp end = (Timestamp) task.getResult().getData().get("endDate");
+                                Timestamp now = new Timestamp(new Date());
 
-                        matchRes.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                System.out.println("END: " + end.getSeconds());
+                                System.out.println("NOW: " + now.getSeconds());
 
-                                        // Retrieve start and end dates used to calculate game duration
-                                        Timestamp end = (Timestamp) document.getData().get("endDate");
-                                        Timestamp now = new Timestamp(new Date());
+                                long remainingTime = end.getSeconds() - now.getSeconds();
 
-                                        System.out.println("END: " + end.getSeconds());
-                                        System.out.println("NOW: " + now.getSeconds());
+                                System.out.println("REMAINING TIME: " + remainingTime);
 
-                                        long remainingTime = end.getSeconds() - now.getSeconds();
+                                // Using these two var, calculate timer
+                                timeInMillis = remainingTime * 1000;
 
-                                        System.out.println("REMAINING TIME: " + remainingTime);
-
-                                        // Using these two var, calculate timer
-                                        timeInMillis = remainingTime * 1000;
-
-                                        System.out.println("TIME IN MILLIS: " + timeInMillis);
-                                        startCountDown();
-                                    }
-                                } else {
-                                    // TODO: do something here to handle error
-                                }
+                                System.out.println("TIME IN MILLIS: " + timeInMillis);
+                                startCountDown();
                             }
-                        });
-
-                    }
-                } else {
-                    // TODO: do something here to handle error
+                        }
+                    });
                 }
             }
         });
+
 
         showRanking.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,6 +171,14 @@ public class MatchRecapFragment extends Fragment {
             public void onClick(View view) {
                 // if match is over, takes user back to home
                 if(matchIsOver) {
+                    //TODO (SC): reset counter in user document (in users collection). Stop service and reset local step counter.
+                    DocumentReference userRef = db.collection("matches").document(userId);
+                    userRef.update("steps", 0);
+
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                            .putInt("pauseCount", 0).apply();
+                    getActivity().stopService(new Intent(getActivity(), SensorListener.class));
+
                     NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                     NavController navController = navHostFragment.getNavController();
                     navController.navigate(R.id.nav_home);

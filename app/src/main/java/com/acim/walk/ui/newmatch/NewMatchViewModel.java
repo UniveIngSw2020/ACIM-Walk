@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NewMatchViewModel extends ViewModel {
 
@@ -72,9 +73,16 @@ public class NewMatchViewModel extends ViewModel {
 
         batch.set(newMatchRef, matchDetails);
         CollectionReference participantsCollection = newMatchRef.collection("participants");
-        DocumentReference participantsReference = participantsCollection.document("participants");
-        batch.set(participantsReference, participantsMap);
 
+        //rimuovere questo documento e creare un documento per ogni elemento della mappa participantsMap
+        //DocumentReference participantsReference = participantsCollection.document("participants");
+        for (Map.Entry<String, User> entry : participantsMap.entrySet()) {
+            System.out.println(entry.getKey() + "/" + entry.getValue());
+            DocumentReference newParticipantRef = participantsCollection.document(entry.getKey());
+            batch.set(newParticipantRef, entry.getValue());
+        }
+
+        //batch.set(participantsReference, participantsMap);
 
         // In the same "transaction" updates the current match reference to users
         for(User user : participants){

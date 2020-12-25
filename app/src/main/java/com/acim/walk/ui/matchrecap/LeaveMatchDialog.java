@@ -79,10 +79,8 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
 
                                                                 // Update new List in firebase, without current user
                                                                 WriteBatch batch = db.batch();
-                                                                DocumentReference doc = db.collection("matches").document(matchId).collection("participants").document("participants");
-                                                                Map<String, Object> deleteUser = new HashMap<>();
-                                                                deleteUser.put(userId, FieldValue.delete());
-                                                                batch.update(doc,deleteUser);
+                                                                DocumentReference doc = db.collection("matches").document(matchId).collection("participants").document(userId);
+                                                                batch.delete(doc);
                                                                 //batch.update(doc, "participants", participants);
 
                                                                 //Clear matchId reference on user document
@@ -94,7 +92,7 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                                                                 batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                     @Override
                                                                     public void onComplete(@NonNull Task<Void> task) {
-                                                                        Log.d(TAG, "User added to 'users' collection!");
+                                                                        Log.d(TAG, "Match left successfully. Collections and document updated!");
                                                                     }
                                                                 });
                                                             }
@@ -104,9 +102,9 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                                     }
                                 });
 
+                        // Return to home, stop services and reset counters
                         getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                                 .putInt("pauseCount", 0).apply();
-                        // Return to home
                         getActivity().stopService(new Intent(getActivity(), SensorListener.class));
                         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                         NavController navController = navHostFragment.getNavController();

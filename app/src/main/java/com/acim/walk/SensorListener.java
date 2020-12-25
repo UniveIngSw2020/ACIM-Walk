@@ -93,25 +93,6 @@ public class SensorListener extends Service implements SensorEventListener2 {
         Log.d(TAG, String.format("lastSaveSteps: %d", lastSaveSteps));
         if (steps > lastSaveSteps + SAVE_OFFSET_STEPS ||
                 (steps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {
-            Log.d(TAG, "UpdateIfNecessary entered!");
-            /*
-            Database db = Database.getInstance(this);
-            if (db.getSteps(Util.getToday()) == Integer.MIN_VALUE) {
-                int pauseDifference = steps -
-                        getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                                .getInt("pauseCount", steps);
-                db.insertNewDay(Util.getToday(), steps - pauseDifference);
-                if (pauseDifference > 0) {
-                    // update pauseCount for the new day
-                    getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                            .putInt("pauseCount", steps).apply();
-                }
-            }
-            db.saveCurrentSteps(steps);
-            db.close();
-            lastSaveSteps = steps;
-            lastSaveTime = System.currentTimeMillis();
-            */
 
             DocumentReference userRef = dbContext.collection("users").document(mAuth.getUid());
 
@@ -151,33 +132,6 @@ public class SensorListener extends Service implements SensorEventListener2 {
                     Log.d(TAG, e.getMessage());
                 }
             });
-
-/*
-            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if(task.isSuccessful()){
-                        if(task.getResult() != null){
-                            if(task.getResult().getLong("steps") != null){
-                                if(task.getResult().getLong("steps").intValue() == Integer.MIN_VALUE){
-                                    int pauseDifference = steps -
-                                            getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                                                    .getInt("pauseCount", steps);
-                                    if (pauseDifference > 0) {
-                                        // update pauseCount for the new day
-                                        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                                .putInt("pauseCount", steps).apply();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-
-            userRef.update("steps", steps);
-            */
 
             lastSaveSteps = steps;
             lastSaveTime = System.currentTimeMillis();
@@ -226,11 +180,13 @@ public class SensorListener extends Service implements SensorEventListener2 {
                         .getService(this, 3, new Intent(this, SensorListener.class), 0));
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         try {
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+            this.steps = 0;
             sm.unregisterListener(this);
         } catch (Exception e) {
             if (BuildConfig.DEBUG)
@@ -245,7 +201,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     public static Notification getNotification(final Context context) {
-        //SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
         /*
         Database db = Database.getInstance(context);
         int today_offset = db.getSteps(Util.getToday());
@@ -263,7 +219,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
                 if (task.isSuccessful()) {
                     if (task.getResult() != null) {
                         if (task.getResult().getLong("steps") != null) {
-                            steps = task.getResult().getLong("steps").intValue();
+                            steps += task.getResult().getLong("steps").intValue();
                         }
                     }
                 }

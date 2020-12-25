@@ -39,12 +39,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class HomeFragment extends Fragment implements SensorEventListener2 {
+public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
+
+    private final String TAG = "HomeFragment";
 
     private HomeViewModel homeViewModel;
     private TextView currentStepsTxt, userInfoTxt;
     private Button newMatchBtn, searchMatchBtn;
-    FirebaseFirestore dbfirestore = FirebaseFirestore.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private int todayOffset, total_start, since_boot, total_days;
     public final static NumberFormat formatter = NumberFormat.getInstance(Locale.getDefault());
@@ -55,7 +56,8 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         super.onCreate(savedInstanceState);
 
         //First check if logged in user participates a match. If yes starts the service to enable sensor to count steps and to show notification
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        //TODO (SC): check correctness
+/*        FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         Task<DocumentSnapshot> useRef = db.collection("users").document(mAuth.getUid())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -68,7 +70,7 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
                             }
                         }
                     }
-                });
+                });*/
         //Log.i("LOG", "Service started");
     }
 
@@ -123,7 +125,7 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
     }
 
 
-    @Override
+/*    @Override
     public void onResume() {
         super.onResume();
 
@@ -131,12 +133,12 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
 
         FirebaseFirestore dbfirestore = FirebaseFirestore.getInstance();
         MainActivity activity = (MainActivity)getActivity();
-        String userID = activity != null ? activity.getUserID() : "NaN";
+        String userID = activity != null ? activity.getUserID() : "NaN";*/
 
-        DocumentReference currentUserDocRef = dbfirestore.collection("users").document("prova");
 
+        //TODO (SC): check
         // read todays offset
-        todayOffset = db.getSteps(Util.getToday());
+/*        todayOffset = db.getSteps(Util.getToday());
 
         SharedPreferences prefs =
                 getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
@@ -146,7 +148,7 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
 
         // register a sensorlistener to live update the UI if a step is taken
         SensorManager sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);*/
 /*
         if (sensor == null) {
 
@@ -173,15 +175,16 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         }
 
 */
-        since_boot -= pauseDifference;
+        //TODO (SC): check
+/*        since_boot -= pauseDifference;
 
         total_start = db.getTotalWithoutToday();
         total_days = db.getDays();
 
-        db.close();
-    }
+        db.close();*/
 
-    @Override
+
+/*    @Override
     public void onPause() {
         super.onPause();
         try {
@@ -198,9 +201,9 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
     @Override
     public void onFlushCompleted(Sensor sensor) {
 
-    }
+    }*/
 
-    @Override
+/*    @Override
     public void onSensorChanged(final SensorEvent event) {
         if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
             return;
@@ -217,17 +220,17 @@ public class HomeFragment extends Fragment implements SensorEventListener2 {
         since_boot = (int) event.values[0];
         Log.i("LOG", "onSensorChanged");
         updateCounter();
-    }
+    }*/
 
-    private void updateCounter(){
+/*    private void updateCounter(){
 
         int steps_today = Math.max(todayOffset + since_boot, 0);
         currentStepsTxt.setText(String.format("%d",steps_today));
         Log.i("LOG", "steps updated!");
-    }
+    }*/
 
-    @Override
+/*    @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-    }
+    }*/
 }

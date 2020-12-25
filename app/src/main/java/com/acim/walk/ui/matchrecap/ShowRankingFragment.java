@@ -96,40 +96,22 @@ public class ShowRankingFragment extends Fragment {
 
                         if (matchId == null) return;
 
+                        CollectionReference participants = db.collection("matches").document(matchId).collection("participants");
 
-                        DocumentReference participants = db.collection("matches").document(matchId).collection("participants").document("participants");
-
-                        DocumentReference matchDoc = db.collection("matches").document(matchId);
-                        participants.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        participants.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.getResult().exists()) {
-                                    Map<String, Object> map = (Map<String, Object>) task.getResult().getData();
-                                    Log.d(TAG, map.toString());
-                                    for (Map.Entry<String, Object> entry : map.entrySet()) {
-                                        String email = "";
-                                        String userId = "";
-                                        String username = "";
-                                        int steps = 0;
-                                        switch (entry.getKey()) {
-                                            case "email":
-                                                email = entry.getValue().toString();
-                                                break;
-                                            case "userId":
-                                                userId = entry.getValue().toString();
-                                                break;
-                                            case "username":
-                                                username = entry.getValue().toString();
-                                                break;
-                                            case "steps":
-                                                steps = Math.toIntExact((long) entry.getValue());
-                                                break;
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                    for(QueryDocumentSnapshot snap : task.getResult()){
+                                        String email = snap.getString("email");
+                                        String userId = snap.getString("userId");
+                                        String username = snap.getString("username");
+                                        int steps = Math.toIntExact(snap.getLong("steps"));
 
-                                        }
-                                        Log.d(TAG, email);
-                                        User temp = new User(email, userId, username, steps);
-                                        users.add(temp);
+                                        users.add(new User(email, userId, username, steps));
                                     }
+
+
 
                                     /*
                                      * at this point the arraylist has ALL the participants of this match
