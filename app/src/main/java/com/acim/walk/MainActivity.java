@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     private String username = "";
 
     // Firebase Firestore instance
-    // we need it to find out if the user is partecipating to a game
+    // we need it to find out if the user is participating a game
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
                                     navController.navigate(R.id.nav_matchrecap);
                             }
                         } else {
-                            // TODO: do something here to handle error
+
                             progress.dismiss();
                             // user account not found
                             Intent myIntent = new Intent(MainActivity.this, AuthActivity.class);

@@ -49,6 +49,7 @@ public class SearchMatchFragment extends Fragment {
     private final String JSON_ID = "userId";
     private final String JSON_EMAIL = "userEmail";
     private final String JSON_USERNAME = "username";
+    private final String JSON_IS_HOST = "isHost";
 
     private SearchMatchViewModel searchMatchViewModel;
 
@@ -171,6 +172,7 @@ public class SearchMatchFragment extends Fragment {
             userInfo.put(JSON_ID, userId);
             userInfo.put(JSON_EMAIL, userEmail);
             userInfo.put(JSON_USERNAME, username);
+            userInfo.put(JSON_IS_HOST, false);
         } catch (JSONException e) {
             e.printStackTrace();
         }

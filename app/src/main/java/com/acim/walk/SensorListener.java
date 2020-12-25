@@ -23,11 +23,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Transaction;
 
 import java.text.NumberFormat;
 import java.util.Date;
@@ -69,9 +74,11 @@ public class SensorListener extends Service implements SensorEventListener2 {
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.values[0] > Integer.MAX_VALUE) {
-            if (BuildConfig.DEBUG) Log.i(TAG + " - onSensorChanged","probably not a real value: " + event.values[0]);
+            if (BuildConfig.DEBUG)
+                Log.i(TAG + " - onSensorChanged", "probably not a real value: " + event.values[0]);
             return;
         } else {
+            Log.d(TAG, String.format("steps - sensor: %d", steps));
             steps = (int) event.values[0];
         }
     }
@@ -82,9 +89,11 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     private boolean updateIfNecessary() {
+        Log.d(TAG, String.format("steps: %d", steps));
+        Log.d(TAG, String.format("lastSaveSteps: %d", lastSaveSteps));
         if (steps > lastSaveSteps + SAVE_OFFSET_STEPS ||
                 (steps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {
-
+            Log.d(TAG, "UpdateIfNecessary entered!");
             /*
             Database db = Database.getInstance(this);
             if (db.getSteps(Util.getToday()) == Integer.MIN_VALUE) {
@@ -104,8 +113,46 @@ public class SensorListener extends Service implements SensorEventListener2 {
             lastSaveTime = System.currentTimeMillis();
             */
 
-            //TODO: transaction to update user's steps counter on match document
             DocumentReference userRef = dbContext.collection("users").document(mAuth.getUid());
+
+            dbContext.runTransaction(new Transaction.Function<Void>() {
+                @Nullable
+                @Override
+                public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                    DocumentSnapshot userDoc = transaction.get(userRef);
+                    if (userDoc.exists()) {
+                        String matchId = userDoc.get("matchId").toString();
+                        transaction.update(userRef, "steps", steps);
+
+                        DocumentReference matchRef = dbContext.collection("matches").document(matchId).collection("participants").document(mAuth.getUid());
+                        transaction.update(matchRef, "steps", steps);
+                    }
+
+                    int pauseDifference = steps -
+                            getSharedPreferences("pedometer", Context.MODE_PRIVATE)
+                                    .getInt("pauseCount", steps);
+                    if (pauseDifference > 0) {
+                        // update pauseCount for the new day
+                        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                                .putInt("pauseCount", steps).apply();
+                    }
+
+                    return null;
+                }
+            }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "Transaction completed successfully!");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.d(TAG, "TRANSACTION FAILED!");
+                    Log.d(TAG, e.getMessage());
+                }
+            });
+
+/*
             userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -127,7 +174,11 @@ public class SensorListener extends Service implements SensorEventListener2 {
                     }
                 }
             });
+
+
             userRef.update("steps", steps);
+            */
+
             lastSaveSteps = steps;
             lastSaveTime = System.currentTimeMillis();
 
@@ -139,7 +190,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     private void showNotification() {
-            startForeground(NOTIFICATION_ID, getNotification(this));
+        startForeground(NOTIFICATION_ID, getNotification(this));
     }
 
     @Override
@@ -161,7 +212,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
         PendingIntent pi = PendingIntent
                 .getService(getApplicationContext(), 2, new Intent(this, SensorListener.class),
                         PendingIntent.FLAG_UPDATE_CURRENT);
-        am.set(AlarmManager.RTC, nextUpdate, pi);
+        //am.set(AlarmManager.RTC, nextUpdate, pi);
+        am.set(AlarmManager.RTC, 1500, pi);
         return START_STICKY;
     }
 
@@ -182,7 +234,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
             sm.unregisterListener(this);
         } catch (Exception e) {
             if (BuildConfig.DEBUG)
-            e.printStackTrace();
+                e.printStackTrace();
         }
     }
 
@@ -208,9 +260,9 @@ public class SensorListener extends Service implements SensorEventListener2 {
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    if(task.getResult() != null){
-                        if(task.getResult().getLong("steps") != null){
+                if (task.isSuccessful()) {
+                    if (task.getResult() != null) {
+                        if (task.getResult().getLong("steps") != null) {
                             steps = task.getResult().getLong("steps").intValue();
                         }
                     }
@@ -221,7 +273,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
         Notification.Builder notificationBuilder = getNotificationBuilder(context);
         if (steps > 0) {
-            notificationBuilder.setContentText(String.format("%d", (steps)) )
+            notificationBuilder.setContentText(String.format("%d", (steps)))
                     .setContentTitle("Passi");
         }
 

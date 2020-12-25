@@ -22,10 +22,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,28 +77,13 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                                                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                             if(task.isSuccessful()) {
 
-                                                                // deserializing [{}, .., {}] the collection of objects (users) from Firebase
-                                                                List<Map<String, Object>> tempUsers = (List<Map<String, Object>>) task.getResult().get("participants");
-                                                                List<User> participants = new ArrayList<>();
-
-                                                                // Create a new List that contains all the participants, except current user
-                                                                if (tempUsers != null) {
-                                                                    for (Map<String, Object> user : tempUsers) {
-                                                                        // Create an user and add to participants
-                                                                        if (!userId.equals(user.get("userId").toString())) {
-                                                                            String email = user.get("email").toString();
-                                                                            String id = user.get("userId").toString();
-                                                                            String username = user.get("username").toString();
-                                                                            int steps = Math.toIntExact((Long) user.get("steps"));
-                                                                            participants.add(new User(email,id,username,steps));
-                                                                        }
-                                                                    }
-                                                                }
-
                                                                 // Update new List in firebase, without current user
                                                                 WriteBatch batch = db.batch();
-                                                                DocumentReference doc = db.collection("matches").document(matchId);
-                                                                batch.update(doc, "participants", participants);
+                                                                DocumentReference doc = db.collection("matches").document(matchId).collection("participants").document("participants");
+                                                                Map<String, Object> deleteUser = new HashMap<>();
+                                                                deleteUser.put(userId, FieldValue.delete());
+                                                                batch.update(doc,deleteUser);
+                                                                //batch.update(doc, "participants", participants);
 
                                                                 //Clear matchId reference on user document
                                                                 DocumentReference userDoc = db.collection("users").document(userId);

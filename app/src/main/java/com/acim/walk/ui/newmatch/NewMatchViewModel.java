@@ -13,6 +13,7 @@ import com.acim.walk.Model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class NewMatchViewModel extends ViewModel {
@@ -48,15 +50,31 @@ public class NewMatchViewModel extends ViewModel {
 
         // Retrieves starting moment of the match
         Date startDate = Calendar.getInstance().getTime();
-        // Convert input collection to List (collection is not serializable)
+        // Converts input collection to List (collection is not serializable)
         List<User> usersList = new ArrayList<>(participants);
 
-        // Get a new write batch
+        // Gets a new write batch
         WriteBatch batch = db.batch();
 
         // Creates a new match document assigning to it a random id
         DocumentReference newMatchRef = db.collection("matches").document();
-        batch.set(newMatchRef, new Match(newMatchRef.getId(), startDate, endDate, usersList ));
+
+        HashMap<String, User> participantsMap = new HashMap<>();
+        for(User user : participants){
+            participantsMap.put(user.getUserId(), user);
+        }
+
+        HashMap<String, Object> matchDetails = new HashMap<>();
+        matchDetails.put("endDate", endDate);
+        matchDetails.put("isOver", false);
+        matchDetails.put("matchId", newMatchRef.getId());
+        matchDetails.put("startDate", startDate);
+
+        batch.set(newMatchRef, matchDetails);
+        CollectionReference participantsCollection = newMatchRef.collection("participants");
+        DocumentReference participantsReference = participantsCollection.document("participants");
+        batch.set(participantsReference, participantsMap);
+
 
         // In the same "transaction" updates the current match reference to users
         for(User user : participants){
@@ -64,7 +82,7 @@ public class NewMatchViewModel extends ViewModel {
             batch.update(userRef, "matchId", newMatchRef.getId());
         }
 
-        // Commit the batch
+        // Commits the batch
         batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {

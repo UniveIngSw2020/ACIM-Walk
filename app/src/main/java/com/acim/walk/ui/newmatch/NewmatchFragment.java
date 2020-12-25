@@ -51,6 +51,7 @@ public class NewmatchFragment extends Fragment {
     private final String JSON_EMAIL = "userEmail";
     private final String JSON_USERNAME = "username";
     private final String JSON_MATCH_ID = "matchId";
+    private final String JSON_IS_HOST = "isHost";
 
     private NewMatchViewModel newMatchViewModel;
 
@@ -105,18 +106,21 @@ public class NewmatchFragment extends Fragment {
                     String receivedId = receivedObject.getString(JSON_USER_ID);
                     String receivedEmail = receivedObject.getString(JSON_EMAIL);
                     String receivedUsername = receivedObject.getString(JSON_USERNAME);
+                    Boolean isHost = receivedObject.getBoolean(JSON_IS_HOST);
                     User receivedUser = new User(receivedEmail, receivedId, receivedUsername);
 
-                    Boolean toAdd = true;
-                    for (User user : participants) {
-                        if (user.getUserId().equals(receivedId)) {
-                            toAdd = false;
+                    if(!isHost) {
+                        Boolean toAdd = true;
+                        for (User user : participants) {
+                            if (user.getUserId().equals(receivedId)) {
+                                toAdd = false;
+                            }
                         }
-                    }
-                    if (toAdd) {
-                        participants.add(receivedUser);
-                        userList.add(receivedUsername);
-                        adapter.notifyDataSetChanged();
+                        if (toAdd) {
+                            participants.add(receivedUser);
+                            userList.add(receivedUsername);
+                            adapter.notifyDataSetChanged();
+                        }
                     }
 
                 } catch (JSONException e) {
@@ -182,6 +186,7 @@ public class NewmatchFragment extends Fragment {
             userInfo.put(JSON_USER_ID, userId);
             userInfo.put(JSON_EMAIL, userEmail);
             userInfo.put(JSON_USERNAME, username);
+            userInfo.put(JSON_IS_HOST, true);
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -10,8 +10,6 @@
     <string name="menu_newmatch">Crea partita</string>
     <string name="menu_searchmatch">Cerca partita</string>
     <string name="menu_settings">Impostazioni</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_auth">Walk!</string>
 
     <!-- Strings used for fragments for navigation -->

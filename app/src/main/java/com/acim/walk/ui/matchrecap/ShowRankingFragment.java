@@ -21,6 +21,7 @@ import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ShowRankingFragment extends Fragment {
+
+    private final String TAG = "ShowRankingFragment";
 
     private String userId;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -83,88 +86,79 @@ public class ShowRankingFragment extends Fragment {
          * then we use the 'matchId' to query all the participants of that match from the 'matches' collection
          *
          */
-        Task<QuerySnapshot> userRes = db.collection("users")
-                .whereEqualTo("userId", userId)
-                .get();
 
-        userRes.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+        DocumentReference userDoc = db.document(String.format("users/%s", userId));
+        userDoc.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        String matchId = (String) task.getResult().get("matchId");
 
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-
-                        // getting matchId property from the user
-                        String matchId = (String) document.getData().get("matchId");
-
-                        // User is not playing any game
                         if (matchId == null) return;
 
 
-                        /*
-                         * at this point we have the matchId.
-                         * time to get all the participants of this match
-                         */
-                        Task<QuerySnapshot> matchRes = db.collection("matches")
-                                .whereEqualTo("matchId", matchId)
-                                .get();
-                        matchRes.addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        DocumentReference participants = db.collection("matches").document(matchId).collection("participants").document("participants");
+
+                        DocumentReference matchDoc = db.collection("matches").document(matchId);
+                        participants.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if(task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.getResult().exists()) {
+                                    Map<String, Object> map = (Map<String, Object>) task.getResult().getData();
+                                    Log.d(TAG, map.toString());
+                                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                        String email = "";
+                                        String userId = "";
+                                        String username = "";
+                                        int steps = 0;
+                                        switch (entry.getKey()) {
+                                            case "email":
+                                                email = entry.getValue().toString();
+                                                break;
+                                            case "userId":
+                                                userId = entry.getValue().toString();
+                                                break;
+                                            case "username":
+                                                username = entry.getValue().toString();
+                                                break;
+                                            case "steps":
+                                                steps = Math.toIntExact((long) entry.getValue());
+                                                break;
 
-                                        // deserializing [{}, .., {}] the collection of objects (users) from Firebase
-                                        List<Map<String, Object>> tempUsers = (List<Map<String, Object>>) document.get("participants");
-
-                                        // adding each user to the arraylist
-                                        for (Map<String, Object> user : tempUsers) {
-                                            int steps = Math.toIntExact((long) user.get("steps"));
-                                            String email = user.get("email").toString();
-                                            String userId = user.get("userId").toString();
-                                            String username = (user.get("username") == null) ? "Anonymous" : user.get("username").toString();
-
-                                            User temp = new User(email, userId, username, steps);
-                                            users.add(temp);
                                         }
-
-                                        /*
-                                         * at this point the arraylist has ALL the participants of this match
-                                         * now we sort it (DESCENDING)
-                                         * user with the MOST steps is the FIRST
-                                         */
-                                        Collections.sort(users, new Comparator<User>() {
-                                            @Override
-                                            public int compare(User user, User t1) {
-                                                int mySteps = user.getSteps();
-                                                int opponentSteps = t1.getSteps();
-
-                                                if(mySteps > opponentSteps) return -1;
-                                                else if(mySteps < opponentSteps) return 1;
-                                                return 0;
-                                            }
-                                        });
-
-                                        /*
-                                         * we have all the participants of this match sorted by the number of steps
-                                         * we can now update the recyclerview
-                                         */
-                                        adapter.notifyDataSetChanged();
-
+                                        Log.d(TAG, email);
+                                        User temp = new User(email, userId, username, steps);
+                                        users.add(temp);
                                     }
-                                } else {
-                                    // TODO: do something here to handle error
+
+                                    /*
+                                     * at this point the arraylist has ALL the participants of this match
+                                     * now we sort it (DESCENDING)
+                                     * user with the MOST steps is the FIRST
+                                     */
+                                    Collections.sort(users, new Comparator<User>() {
+                                        @Override
+                                        public int compare(User user, User t1) {
+                                            int mySteps = user.getSteps();
+                                            int opponentSteps = t1.getSteps();
+
+                                            if (mySteps > opponentSteps) return -1;
+                                            else if (mySteps < opponentSteps) return 1;
+                                            return 0;
+                                        }
+                                    });
+
+                                    /*
+                                     * we have all the participants of this match sorted by the number of steps
+                                     * we can now update the recyclerview
+                                     */
+                                    adapter.notifyDataSetChanged();
                                 }
                             }
+
                         });
-
-
                     }
-                } else {
-                    // TODO: do something here to handle error
-                }
-            }
-        });
+                });
 
         return root;
     }
