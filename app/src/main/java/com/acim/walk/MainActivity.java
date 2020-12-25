@@ -1,8 +1,11 @@
 package com.acim.walk;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
@@ -21,6 +24,7 @@ import com.acim.walk.ui.searchmatch.SearchMatchFragment;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -29,10 +33,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
@@ -44,32 +51,45 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity /*implements SensorEventListener2*/ {
+import org.w3c.dom.Document;
+
+public class MainActivity extends AppCompatActivity{
 
     private final String TAG = "MainActivity";
 
     /*
      * these 2 methods will be used later in different fragments to get user's data
      * */
-    public String getUserID() { return userID; }
-    public String getUserEmail() { return userEmail; }
-    public String getUsername() { return  username; }
+    public String getUserID() {
+        return userID;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public String getUsername() {
+        return username;
+    }
 
     // needed to hide some menu's options in some fragments
-    public NavigationView getNavigation() { return navigationView; }
-
-    private AppBarConfiguration mAppBarConfiguration;
-    private NavigationView navigationView;
-    private String userID = "";
-    private String userEmail = "";
-    private String username = "";
+    public NavigationView getNavigation() {
+        return navigationView;
+    }
 
     // Firebase Firestore instance
     // we need it to find out if the user is participating a game
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
-    private long timesInMillis;
+    private AppBarConfiguration mAppBarConfiguration;
+    private NavigationView navigationView;
+    private String userID = "";
+    private String userEmail = "";
+    private String username = "";
+    private Boolean hasGame = false;
+    private Boolean isServiceStopped = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,13 +102,27 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
             userID = extras.getString("userID");
             userEmail = extras.getString("userEmail");
             username = extras.getString("username");
-        }
-        else{
+        } else {
             // Activity created from tap on notification
             userID = mAuth.getUid();
             userEmail = mAuth.getCurrentUser().getEmail();
             username = mAuth.getCurrentUser().getDisplayName();
             username = mAuth.getCurrentUser().getDisplayName();
+        }
+
+        DocumentReference userRef = db.collection("users").document(userID);
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful() && task.getResult().exists()) {
+                    hasGame = task.getResult().getString("matchId") != null && !task.getResult().getString("matchId").equals("") ? true : false;
+                }
+            }
+        });
+
+        if (hasGame) {
+            startForegroundService(new Intent(MainActivity.this, SensorListener.class));
+            isServiceStopped = false;
         }
 
         setContentView(R.layout.activity_main);
@@ -126,7 +160,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
         Log.d(TAG, "USER: " + userID);
 
         DocumentReference userDocRef = db.collection("users").document(userID);
-        if(userDocRef == null){
+        if (userDocRef == null) {
             progress.dismiss();
             // user account not found
             Intent myIntent = new Intent(MainActivity.this, AuthActivity.class);
@@ -148,9 +182,8 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
                                 progress.dismiss();
                                 // getting matchId property from the user
                                 Object matchId = document.getData().get("matchId");
-                                startServiceIfNecessary();
                                 // if user has a match going on, we send him to the recap fragment
-                                if(matchId != null)
+                                if (matchId != null)
                                     navController.navigate(R.id.nav_matchrecap);
                             }
                         } else {
@@ -170,15 +203,7 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
     @Override
     protected void onResume() {
         super.onResume();
-        startServiceIfNecessary();
-    }
 
-    public void passTimeInMillis(long time) {
-        timesInMillis = time;
-    }
-
-    public long getTimesInMillis() {
-        return timesInMillis;
     }
 
 
@@ -189,19 +214,11 @@ public class MainActivity extends AppCompatActivity /*implements SensorEventList
                 || super.onSupportNavigateUp();
     }
 
-    private void startServiceIfNecessary(){
-        Task<DocumentSnapshot> useRef = db.collection("users").document(mAuth.getUid())
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            if(task.getResult() != null && task.getResult().getString("matchId") != null && task.getResult().getString("matchId") != ""){
-                                startForegroundService(new Intent(MainActivity.this, SensorListener.class));
-                                Log.i(TAG, String.format("Service started - %s", task.getResult().getString("matchId")));
-                            }
-                        }
-                    }
-                });
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
     }
 
 }

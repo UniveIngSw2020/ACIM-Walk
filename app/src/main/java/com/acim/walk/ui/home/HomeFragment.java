@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.acim.walk.Database;
+//import com.acim.walk.Database;
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
@@ -137,6 +137,7 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
 
 
         //TODO (SC): check
+
         // read todays offset
 /*        todayOffset = db.getSteps(Util.getToday());
 

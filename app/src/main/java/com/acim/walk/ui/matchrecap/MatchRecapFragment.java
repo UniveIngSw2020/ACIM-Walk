@@ -134,12 +134,7 @@ public class MatchRecapFragment extends Fragment {
                                 Timestamp end = (Timestamp) task.getResult().getData().get("endDate");
                                 Timestamp now = new Timestamp(new Date());
 
-                                System.out.println("END: " + end.getSeconds());
-                                System.out.println("NOW: " + now.getSeconds());
-
                                 long remainingTime = end.getSeconds() - now.getSeconds();
-
-                                System.out.println("REMAINING TIME: " + remainingTime);
 
                                 // Using these two var, calculate timer
                                 timeInMillis = remainingTime * 1000;
@@ -177,6 +172,8 @@ public class MatchRecapFragment extends Fragment {
 
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                             .putInt("pauseCount", 0).apply();
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                            .putInt("savedSteps", 0).apply();
                     getActivity().stopService(new Intent(getActivity(), SensorListener.class));
 
                     NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
@@ -248,6 +245,8 @@ public class MatchRecapFragment extends Fragment {
                 // stopping steps service
                 getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("pauseCount", 0).apply();
+                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                        .putInt("savedSteps", 0).apply();
                 getActivity().stopService(new Intent(getActivity(), SensorListener.class));
             }
         }.start();

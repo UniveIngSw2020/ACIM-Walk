@@ -22,6 +22,7 @@ public class ShutdownRecevier extends BroadcastReceiver {
                 .putBoolean("correctShutdown", true).apply();
 
 
+        /*
         Database db = Database.getInstance(context);
         // if it's already a new day, add the temp. steps to the last one
         if (db.getSteps(System.currentTimeMillis()) == Integer.MIN_VALUE) {
@@ -32,6 +33,7 @@ public class ShutdownRecevier extends BroadcastReceiver {
         }
         // current steps will be reset on boot @see BootReceiver
         db.close();
+         */
 
     }
 

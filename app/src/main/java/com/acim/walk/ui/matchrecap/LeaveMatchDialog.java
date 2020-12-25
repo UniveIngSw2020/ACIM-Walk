@@ -105,7 +105,14 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                         // Return to home, stop services and reset counters
                         getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                                 .putInt("pauseCount", 0).apply();
+                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                                .putInt("savedSteps", 0).apply();
                         getActivity().stopService(new Intent(getActivity(), SensorListener.class));
+
+                        // call unregisterReceiver - to stop listening for broadcasts.
+                        //getActivity().unregisterReceiver(broadcastReceiver);
+
+
                         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                         NavController navController = navHostFragment.getNavController();
                         navController.navigate(R.id.nav_home);

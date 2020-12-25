@@ -11,16 +11,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -41,6 +44,7 @@ import java.util.Locale;
 public class SensorListener extends Service implements SensorEventListener2 {
 
     private final String TAG = "SensorListenerClass";
+
     private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
     private final static int SAVE_OFFSET_STEPS = 1;
     private final static long SAVE_OFFSET_TIME = 30000;
@@ -53,6 +57,13 @@ public class SensorListener extends Service implements SensorEventListener2 {
     private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
     private static FirebaseFirestore dbContext = FirebaseFirestore.getInstance();
     private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+
+    //Prove
+    private final Handler handler = new Handler();
+    int stepCounter;
+    static int newStepCounter;
+    boolean userInGame; // Boolean variable to control the repeating timer.
 
     @Nullable
     @Override
@@ -69,6 +80,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "SensorListener onCreate");
+        stepCounter = 0;
+        newStepCounter = 0;
     }
 
     @Override
@@ -80,6 +93,20 @@ public class SensorListener extends Service implements SensorEventListener2 {
         } else {
             Log.d(TAG, String.format("steps - sensor: %d", steps));
             steps = (int) event.values[0];
+
+
+            int countSteps = (int) event.values[0];
+
+            SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+            int savedSteps = prefs.getInt("savedSteps", 0);
+            // -The efficient way of starting a new step counting sequence.-
+            /*if (stepCounter == 0) { // If the stepCounter is in its initial value, then...
+                stepCounter = (int) event.values[0]; // Assign the StepCounter Sensor event value to it.
+                Log.d(TAG, String.format("Entra IF"));
+            }*/
+            newStepCounter = countSteps - savedSteps; // By subtracting the stepCounter variable from the Sensor event value - We start a new counting sequence from 0. Where the Sensor event value will increase, and stepCounter value will be only initialised once.
+            Log.d(TAG, String.format("NewStepCounter: %d", newStepCounter));
+            prefs.edit().putInt("savedSteps", newStepCounter);
         }
     }
 
@@ -103,19 +130,19 @@ public class SensorListener extends Service implements SensorEventListener2 {
                     DocumentSnapshot userDoc = transaction.get(userRef);
                     if (userDoc.exists()) {
                         String matchId = userDoc.get("matchId").toString();
-                        transaction.update(userRef, "steps", steps);
+                        transaction.update(userRef, "steps", newStepCounter);
 
                         DocumentReference matchRef = dbContext.collection("matches").document(matchId).collection("participants").document(mAuth.getUid());
-                        transaction.update(matchRef, "steps", steps);
+                        transaction.update(matchRef, "steps", newStepCounter);
                     }
 
                     int pauseDifference = steps -
                             getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                                    .getInt("pauseCount", steps);
+                                    .getInt("pauseCount", newStepCounter);
                     if (pauseDifference > 0) {
                         // update pauseCount for the new day
                         getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("pauseCount", steps).apply();
+                                .putInt("pauseCount", newStepCounter).apply();
                     }
 
                     return null;
@@ -149,7 +176,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
-        //TODO: fire only when a match has started (or when device boots and a match is ongoing)
+
         Log.i(TAG, "onStartCommand SERVICE");
         reRegisterSensor();
         registerBroadcastReceiver();
@@ -157,18 +184,32 @@ public class SensorListener extends Service implements SensorEventListener2 {
             showNotification();
         }
 
-        // restart service every hour to save the current step count
-        long nextUpdate = Math.min(Util.getTomorrow(),
-                System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR);
-        //if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
-        AlarmManager am =
-                (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pi = PendingIntent
-                .getService(getApplicationContext(), 2, new Intent(this, SensorListener.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-        //am.set(AlarmManager.RTC, nextUpdate, pi);
-        am.set(AlarmManager.RTC, 1500, pi);
-        return START_STICKY;
+
+        // if user is participating a match restart service every hour to save the current step count
+
+        DocumentReference userRef = dbContext.document("users/" + mAuth.getUid());
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful() && task.getResult().exists()) {
+                    userInGame = true;
+                }
+            }
+        });
+        if (userInGame) {
+            long nextUpdate = Math.min(Util.getTomorrow(),
+                    System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR);
+            //if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
+            AlarmManager am =
+                    (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pi = PendingIntent
+                    .getService(getApplicationContext(), 2, new Intent(this, SensorListener.class),
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+            am.set(AlarmManager.RTC, nextUpdate, pi);
+            am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);
+            return START_STICKY;
+        }
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -185,8 +226,14 @@ public class SensorListener extends Service implements SensorEventListener2 {
     public void onDestroy() {
         super.onDestroy();
         try {
+
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-            this.steps = 0;
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.cancel(0);
+
+            Log.d(TAG, "onDestroy called");
+            getSharedPreferences("pedometer", Context.MODE_PRIVATE)
+                    .getInt("pauseCount", 0);
             sm.unregisterListener(this);
         } catch (Exception e) {
             if (BuildConfig.DEBUG)
@@ -201,14 +248,14 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     public static Notification getNotification(final Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE);
-        /*
-        Database db = Database.getInstance(context);
+
+
+/*        Database db = Database.getInstance(context);
         int today_offset = db.getSteps(Util.getToday());
         if (steps == 0)
             steps = db.getCurrentSteps(); // use saved value if we haven't anything better
-        db.close();
-        */
+        db.close();*/
+
         //TODO: check if the value of the step counter is correct
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -229,7 +276,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
         Notification.Builder notificationBuilder = getNotificationBuilder(context);
         if (steps > 0) {
-            notificationBuilder.setContentText(String.format("%d", (steps)))
+            notificationBuilder.setContentText(String.format("%d", (newStepCounter)))
                     .setContentTitle("Passi");
         }
 
@@ -275,6 +322,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
         // enable batching with delay of max 5 min
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
-                SensorManager.SENSOR_DELAY_NORMAL, (int) (5 * MICROSECONDS_IN_ONE_MINUTE));
+                SensorManager.SENSOR_DELAY_NORMAL, (int) (MICROSECONDS_IN_ONE_MINUTE));
     }
+
+
 }
