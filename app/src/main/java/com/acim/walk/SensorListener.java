@@ -43,7 +43,6 @@ public class SensorListener extends Service implements SensorEventListener2 {
     public final static String NOTIFICATION_CHANNEL_ID = "Notification";
     public final static int NOTIFICATION_ID = 1;
     private static int sensorSteps;
-    private static int lastSaveSteps;
     private static long lastSaveTime;
 
     private final BroadcastReceiver shutdownReceiver = new ShutdownRecevier();
@@ -52,9 +51,6 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
 
     //Prove
-    private final Handler handler = new Handler();
-    private int stepCounter;
-    private static int notificationSteps;
     private static int currentMatchSteps;
     private boolean userInGame; // Boolean variable to control the repeating timer.
 
@@ -73,18 +69,11 @@ public class SensorListener extends Service implements SensorEventListener2 {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "SensorListener onCreate");
-
-/*        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                .putInt("matchStartedAtSteps", 0).apply();
-        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                .putInt("savedSteps", 0).apply();*/
-
-
-        //int startMatchSteps = prefs.getInt("matchStartedAtSteps", 0);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        Log.i(TAG, "onSensorChanged");
         if (event.values[0] > Integer.MAX_VALUE) {
             if (BuildConfig.DEBUG)
                 Log.i(TAG + " - onSensorChanged", "probably not a real value: " + event.values[0]);
@@ -100,7 +89,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
                 Log.d(TAG, String.format("Entra IF"));
             }*/
             currentMatchSteps = sensorSteps - startMatchSteps; // By subtracting the stepCounter variable from the Sensor event value - We start a new counting sequence from 0. Where the Sensor event value will increase, and stepCounter value will be only initialised once.
-            Log.d(TAG, String.format("current steps: %d", currentMatchSteps));
+            Log.i(TAG, String.format("current steps: %d", currentMatchSteps));
+            Log.i(TAG, String.format("start match steps: %d", startMatchSteps));
             prefs.edit().putInt("savedSteps", currentMatchSteps);
         }
     }
@@ -111,10 +101,10 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     private boolean updateIfNecessary() {
-        Log.d(TAG, String.format("steps: %d", sensorSteps));
-        Log.d(TAG, String.format("lastSaveSteps: %d", lastSaveSteps));
-        if (sensorSteps > currentMatchSteps + SAVE_OFFSET_STEPS ||
-                (sensorSteps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {
+        Log.i(TAG, String.format("updateIfNecessary -> sensorSteps: %d", sensorSteps));
+        Log.i(TAG, String.format("updateIfNecessary -> currentMatchSteps: %d", currentMatchSteps));
+/*        if (sensorSteps > currentMatchSteps + SAVE_OFFSET_STEPS ||
+                (sensorSteps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {*/
 
             DocumentReference userRef = dbContext.collection("users").document(mAuth.getUid());
 
@@ -131,41 +121,32 @@ public class SensorListener extends Service implements SensorEventListener2 {
                         transaction.update(matchRef, "steps", currentMatchSteps);
                     }
 
-/*                    int pauseDifference = sensorSteps -
-                            getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                                    .getInt("matchStartedAtSteps", currentMatchSteps);
-                    if (pauseDifference > 0) {
-                        // update pauseCount for the new day
-                        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("matchStartedAtSteps", currentMatchSteps).apply();
-                    }*/
-
                     return null;
                 }
             }).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    Log.d(TAG, "Transaction completed successfully!");
+                    Log.i(TAG, "Transaction completed successfully!");
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.d(TAG, "TRANSACTION FAILED!");
-                    Log.d(TAG, e.getMessage());
+                    Log.i(TAG, "TRANSACTION FAILED!");
+                    Log.i(TAG, e.getMessage());
                 }
             });
 
-            //lastSaveSteps = sensorSteps;
             lastSaveTime = System.currentTimeMillis();
 
             showNotification(); // update notification
             return true;
-        } else {
+        /*} else {
             return false;
-        }
+        }*/
     }
 
     private void showNotification() {
+        Log.i(TAG, "showNotification");
         startForeground(NOTIFICATION_ID, getNotification(this));
     }
 
@@ -194,13 +175,10 @@ public class SensorListener extends Service implements SensorEventListener2 {
             SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
             currentMatchSteps = prefs.getInt("savedSteps", 0);
 
-            if(sensorSteps > 0){
+            int offset = getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
+            if(sensorSteps == 0 || offset == 0){
                 getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("matchStartedAtSteps", sensorSteps).apply();
-            }
-            else{
-                getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("matchStartedAtSteps", 0).apply();
             }
 
             long nextUpdate = Math.min(Util.getTomorrow(),
@@ -220,6 +198,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
     @Override
     public void onTaskRemoved(final Intent rootIntent) {
+        Log.i(TAG, "OnTaskRemoved");
         super.onTaskRemoved(rootIntent);
         // Restart service in 500 ms
         ((AlarmManager) getSystemService(Context.ALARM_SERVICE))
@@ -232,14 +211,13 @@ public class SensorListener extends Service implements SensorEventListener2 {
     public void onDestroy() {
         super.onDestroy();
         try {
-
+            Log.i(TAG, "onDestroy called");
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             manager.cancel(NOTIFICATION_ID);
 
-            Log.d(TAG, "onDestroy called");
-            //getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-            //        .getInt("pauseCount", 0);
+            getSharedPreferences("pedometer", Context.MODE_PRIVATE)
+                    .edit().putInt("savedSteps", currentMatchSteps);
             sm.unregisterListener(this);
         } catch (Exception e) {
             if (BuildConfig.DEBUG)
@@ -248,12 +226,14 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     private void registerBroadcastReceiver() {
+        Log.i(TAG, "registerBroadcastReceiver");
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_SHUTDOWN);
         registerReceiver(shutdownReceiver, filter);
     }
 
     public static Notification getNotification(final Context context) {
+        Log.i("STATIC", "getNotification -> currentMatchSteps: " + currentMatchSteps);
         Notification.Builder notificationBuilder = getNotificationBuilder(context);
         notificationBuilder.setContentText(String.format("%d", (currentMatchSteps))).setContentTitle("Passi");
 
@@ -266,6 +246,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     public static Notification.Builder getNotificationBuilder(final Context context) {
+        Log.i("STATIC", "getNotificationBuilder");
         NotificationManager manager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationChannel channel =
@@ -282,6 +263,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     private void reRegisterSensor() {
+        Log.i(TAG, "reRegisterSensor");
         //if (BuildConfig.DEBUG) Logger.log("re-register sensor listener");
         SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
         try {
@@ -291,15 +273,15 @@ public class SensorListener extends Service implements SensorEventListener2 {
             e.printStackTrace();
         }
 
-        if (BuildConfig.DEBUG) {
+/*        if (BuildConfig.DEBUG) {
             //Logger.log("step sensors: " + sm.getSensorList(Sensor.TYPE_STEP_COUNTER).size());
             if (sm.getSensorList(Sensor.TYPE_STEP_COUNTER).size() < 1) return; // emulator
             //Logger.log("default: " + sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER).getName());
-        }
+        }*/
 
         // enable batching with delay of max 5 min
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
-                SensorManager.SENSOR_DELAY_NORMAL, (int) (MICROSECONDS_IN_ONE_MINUTE));
+                SensorManager.SENSOR_DELAY_NORMAL, (int) (6000000));
     }
 
 
