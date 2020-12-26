@@ -1,5 +1,6 @@
 package com.acim.walk.ui.searchmatch;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -187,6 +188,10 @@ public class SearchMatchFragment extends Fragment {
             public void run() {
                 if(searchMatchViewModel.checkForMatchParticipation(userId)) {
                     getActivity().startService(new Intent(getActivity(), SensorListener.class));
+
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                            .putInt("savedSteps", 0).apply();
+
                     scheduler.shutdown();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override

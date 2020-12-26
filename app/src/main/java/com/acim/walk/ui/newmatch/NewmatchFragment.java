@@ -1,5 +1,6 @@
 package com.acim.walk.ui.newmatch;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -216,6 +217,9 @@ public class NewmatchFragment extends Fragment {
 
                 // start the service to count steps
                 getActivity().startService(new Intent(getActivity(), SensorListener.class));
+
+                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                        .putInt("savedSteps", 0).apply();
                 // go to match recap page
                 NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                 NavController navController = navHostFragment.getNavController();

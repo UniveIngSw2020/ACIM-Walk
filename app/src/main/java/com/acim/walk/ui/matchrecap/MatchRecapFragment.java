@@ -140,7 +140,7 @@ public class MatchRecapFragment extends Fragment {
                                 timeInMillis = remainingTime * 1000;
 
                                 System.out.println("TIME IN MILLIS: " + timeInMillis);
-                                startCountDown();
+                                startCountDown(getActivity());
                             }
                         }
                     });
@@ -171,8 +171,6 @@ public class MatchRecapFragment extends Fragment {
                     userRef.update("steps", 0);
 
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                            .putInt("pauseCount", 0).apply();
-                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                             .putInt("savedSteps", 0).apply();
                     getActivity().stopService(new Intent(getActivity(), SensorListener.class));
 
@@ -196,7 +194,7 @@ public class MatchRecapFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    private void startCountDown() {
+    private void startCountDown(Context context) {
         countDownTimer = new CountDownTimer(timeInMillis, 1000) {
             @Override
             public void onTick(long l) {
@@ -243,11 +241,11 @@ public class MatchRecapFragment extends Fragment {
                         });
 
                 // stopping steps service
-                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("pauseCount", 0).apply();
-                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+
+                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("savedSteps", 0).apply();
-                getActivity().stopService(new Intent(getActivity(), SensorListener.class));
+
+                context.stopService(new Intent(context, SensorListener.class));
             }
         }.start();
     }
