@@ -67,7 +67,7 @@ public class NewMatchViewModel extends ViewModel {
 
         HashMap<String, Object> matchDetails = new HashMap<>();
         matchDetails.put("endDate", endDate);
-        matchDetails.put("isOver", false);
+        // matchDetails.put("isOver", false); At the moment, it is useless
         matchDetails.put("matchId", newMatchRef.getId());
         matchDetails.put("startDate", startDate);
 
@@ -101,6 +101,7 @@ public class NewMatchViewModel extends ViewModel {
         return newMatchRef.getId();
     }
 
+    // Function that retrieve the timestamp when the game will end
     public Date getEndDate(EditText gameTime) {
         Date currentDate = Calendar.getInstance().getTime();
         long timer = currentDate.getTime();
@@ -112,7 +113,7 @@ public class NewMatchViewModel extends ViewModel {
         return currentDate;
     }
 
-    // Function that set the correct string that contains the timer
+    // Function that set the correct string that contains the timer in milliseconds
     public int gameTimeInMilliseconds(EditText gameTime) {
         String time = String.valueOf(gameTime.getText());
         int timeInMillis = 0;

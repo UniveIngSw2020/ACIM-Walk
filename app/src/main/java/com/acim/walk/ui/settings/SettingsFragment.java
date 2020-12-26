@@ -8,25 +8,83 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.acim.walk.AuthActivity;
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SettingsFragment extends Fragment {
 
     private SettingsViewModel settingsViewModel;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private Button logoutBtn;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Get userId from MainActivity
+        MainActivity activity = (MainActivity) getActivity();
+        String userId = activity.getUserID();
+
+        /*
+        *
+        * Handle when user press go back button inside settings.
+        * If user is playing a match, he will return to match recap page, otherwise he will return
+        * to home page
+        *
+        * */
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+                db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()) {
+                                    @Nullable
+                                    String matchId = (String) task.getResult().getData().get("matchId");
+
+                                    NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+                                    NavController navController = navHostFragment.getNavController();
+
+                                    // Go to home page
+                                    if (matchId == null) {
+                                        navController.navigate(R.id.nav_home);
+                                    }
+                                    // Otherwise, go to match recap
+                                    else {
+                                        navController.navigate(R.id.nav_matchrecap);
+                                    }
+
+                                }
+                            }
+                        });
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

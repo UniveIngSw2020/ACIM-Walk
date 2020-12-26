@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -28,6 +29,7 @@ import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
+import com.acim.walk.ui.CloseAppDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,6 +56,43 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        /*
+         * Callback used when user press go back button. In this case user can go back to previous page
+         * but he can only close application. So when user press go back button a dialog will be opened
+         * and ask to user if he wants to close application
+         *
+         */
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button even
+                Log.d("BACKBUTTON", "Back button clicks");
+
+                CloseAppDialog closeAppDialog = new CloseAppDialog();
+                closeAppDialog.show(getActivity().getSupportFragmentManager(), "");
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
+
+        //First check if logged in user participates a match. If yes starts the service to enable sensor to count steps and to show notification
+        //TODO (SC): check correctness
+/*        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        Task<DocumentSnapshot> useRef = db.collection("users").document(mAuth.getUid())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            if(task.getResult() != null && task.getResult().getString("matchId") != null && task.getResult().getString("matchId") != ""){
+                                getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
+                                Log.i("LOG", "Service started");
+                            }
+                        }
+                    }
+                });*/
+        //Log.i("LOG", "Service started");
     }
 
     @Override
@@ -105,4 +144,115 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
         Log.i("LOG", "onCreateView");
         return root;
     }
+
+
+/*    @Override
+    public void onResume() {
+        super.onResume();
+
+        Database db = Database.getInstance(getActivity());
+
+        FirebaseFirestore dbfirestore = FirebaseFirestore.getInstance();
+        MainActivity activity = (MainActivity)getActivity();
+        String userID = activity != null ? activity.getUserID() : "NaN";*/
+
+
+        //TODO (SC): check
+
+        // read todays offset
+/*        todayOffset = db.getSteps(Util.getToday());
+
+        SharedPreferences prefs =
+                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+
+        since_boot = db.getCurrentSteps();
+        int pauseDifference = since_boot - prefs.getInt("pauseCount", since_boot);
+
+        // register a sensorlistener to live update the UI if a step is taken
+        SensorManager sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        Sensor sensor = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);*/
+/*
+        if (sensor == null) {
+
+            // L'APP mi crasha nell'emulatore
+
+            new AlertDialog.Builder(getActivity()).setTitle("Sensori richiesti assenti")
+                    .setMessage("Il tuo telefono non supporta l'applicazione")
+                    .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(final DialogInterface dialogInterface) {
+                            getActivity().finish();
+                        }
+                    }).setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(final DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).create().show();
+
+
+
+        } else {
+            sm.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI, 0);
+        }
+
+*/
+        //TODO (SC): check
+/*        since_boot -= pauseDifference;
+
+        total_start = db.getTotalWithoutToday();
+        total_days = db.getDays();
+
+        db.close();*/
+
+
+/*    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            SensorManager sm =
+                    (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+            sm.unregisterListener(this);
+        } catch (Exception e) {
+        }
+        Database db = Database.getInstance(getActivity());
+        db.saveCurrentSteps(since_boot);
+        db.close();
+    }
+
+    @Override
+    public void onFlushCompleted(Sensor sensor) {
+
+    }*/
+
+/*    @Override
+    public void onSensorChanged(final SensorEvent event) {
+        if (event.values[0] > Integer.MAX_VALUE || event.values[0] == 0) {
+            return;
+        }
+        if (todayOffset == Integer.MIN_VALUE) {
+            // no values for today
+            // we dont know when the reboot was, so set todays steps to 0 by
+            // initializing them with -STEPS_SINCE_BOOT
+            todayOffset = -(int) event.values[0];
+            Database db = Database.getInstance(getActivity());
+            db.insertNewDay(Util.getToday(), (int) event.values[0]);
+            db.close();
+        }
+        since_boot = (int) event.values[0];
+        Log.i("LOG", "onSensorChanged");
+        updateCounter();
+    }*/
+
+/*    private void updateCounter(){
+
+        int steps_today = Math.max(todayOffset + since_boot, 0);
+        currentStepsTxt.setText(String.format("%d",steps_today));
+        Log.i("LOG", "steps updated!");
+    }*/
+
+/*    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }*/
 }
