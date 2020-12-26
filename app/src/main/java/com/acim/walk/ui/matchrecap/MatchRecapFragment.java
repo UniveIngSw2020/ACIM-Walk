@@ -241,10 +241,6 @@ public class MatchRecapFragment extends Fragment {
                         });
 
                 // stopping steps service
-
-                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("savedSteps", 0).apply();
-
                 context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("savedSteps", 0).apply();
                 context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()

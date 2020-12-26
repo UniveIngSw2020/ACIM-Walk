@@ -52,7 +52,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
     //Prove
     private static int currentMatchSteps;
-    private boolean userInGame; // Boolean variable to control the repeating timer.
+    private static boolean startedOnce = false;
+    private static boolean userInGame = false; // Boolean variable to control the repeating timer.
 
     @Nullable
     @Override
@@ -92,6 +93,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
             Log.i(TAG, String.format("current steps: %d", currentMatchSteps));
             Log.i(TAG, String.format("start match steps: %d", startMatchSteps));
             prefs.edit().putInt("savedSteps", currentMatchSteps);
+            updateIfNecessary();
         }
     }
 
@@ -103,8 +105,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
     private boolean updateIfNecessary() {
         Log.i(TAG, String.format("updateIfNecessary -> sensorSteps: %d", sensorSteps));
         Log.i(TAG, String.format("updateIfNecessary -> currentMatchSteps: %d", currentMatchSteps));
-/*        if (sensorSteps > currentMatchSteps + SAVE_OFFSET_STEPS ||
-                (sensorSteps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME)) {*/
+        if (currentMatchSteps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME) {
 
             DocumentReference userRef = dbContext.collection("users").document(mAuth.getUid());
 
@@ -140,9 +141,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
             showNotification(); // update notification
             return true;
-        /*} else {
-            return false;
-        }*/
+        }
+        return false;
     }
 
     private void showNotification() {
@@ -156,9 +156,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
         Log.i(TAG, "onStartCommand SERVICE");
         reRegisterSensor();
         registerBroadcastReceiver();
-        if (!updateIfNecessary()) {
-            showNotification();
-        }
+        updateIfNecessary();
 
         // if user is participating a match restart service every hour to save the current step count
         DocumentReference userRef = dbContext.document("users/" + mAuth.getUid());
@@ -166,17 +164,41 @@ public class SensorListener extends Service implements SensorEventListener2 {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful() && task.getResult().exists()) {
-                    userInGame = true;
+                    if (task.getResult().getString("matchId") != null && !task.getResult().getString("matchId").equals(""))
+                        userInGame = true;
+
+
+                    SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+                    currentMatchSteps = prefs.getInt("savedSteps", 0);
+
+                    if (!startedOnce) {
+                        startedOnce = true;
+                        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                                .putInt("matchStartedAtSteps", sensorSteps).apply();
+                    }
+
+                    long nextUpdate = Math.min(Util.getTomorrow(),
+                            System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR);
+                    //if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
+                    AlarmManager am =
+                            (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                    PendingIntent pi = PendingIntent
+                            .getService(getApplicationContext(), 2, new Intent(getApplicationContext(), SensorListener.class),
+                                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    am.set(AlarmManager.RTC, nextUpdate, pi);
+                    am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);
+                    //return START_STICKY;
                 }
             }
         });
         if (userInGame) {
 
-            SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+/*            SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
             currentMatchSteps = prefs.getInt("savedSteps", 0);
 
             int offset = getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
-            if(sensorSteps == 0 || offset == 0){
+            Log.i(TAG, "onStartCommand -> offset: " + offset);
+            if(sensorSteps == 0 || offset != 0){
                 getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("matchStartedAtSteps", sensorSteps).apply();
             }
@@ -190,7 +212,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
                     .getService(getApplicationContext(), 2, new Intent(this, SensorListener.class),
                             PendingIntent.FLAG_UPDATE_CURRENT);
             am.set(AlarmManager.RTC, nextUpdate, pi);
-            am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);
+            am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);*/
             return START_STICKY;
         }
         return START_NOT_STICKY;
@@ -215,7 +237,9 @@ public class SensorListener extends Service implements SensorEventListener2 {
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             manager.cancel(NOTIFICATION_ID);
-
+            startedOnce = false;
+            userInGame = false;
+            stopService(new Intent(this, SensorListener.class));
             getSharedPreferences("pedometer", Context.MODE_PRIVATE)
                     .edit().putInt("savedSteps", currentMatchSteps);
             sm.unregisterListener(this);

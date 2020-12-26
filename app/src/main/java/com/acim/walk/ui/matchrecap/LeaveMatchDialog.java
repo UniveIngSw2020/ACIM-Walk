@@ -106,8 +106,6 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                         getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                                 .putInt("savedSteps", 0).apply();
                         getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("savedSteps", 0).apply();
-                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                                 .putInt("matchStartedAtSteps", 0).apply();
 
                         getActivity().stopService(new Intent(getActivity(), SensorListener.class));

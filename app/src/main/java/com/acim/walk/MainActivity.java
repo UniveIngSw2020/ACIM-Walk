@@ -110,15 +110,18 @@ public class MainActivity extends AppCompatActivity{
             username = mAuth.getCurrentUser().getDisplayName();
         }
 
-        DocumentReference userRef = db.collection("users").document(userID);
-        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful() && task.getResult().exists()) {
-                    hasGame = task.getResult().getString("matchId") != null && !task.getResult().getString("matchId").equals("") ? true : false;
+        if(isServiceStopped){
+            DocumentReference userRef = db.collection("users").document(userID);
+            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful() && task.getResult().exists()) {
+                        hasGame = task.getResult().getString("matchId") != null && !task.getResult().getString("matchId").equals("") ? true : false;
+                        Log.i(TAG, "USER PARTICIPATES A MATCH");
+                    }
                 }
-            }
-        });
+            });
+        }
 
         if (hasGame) {
             startForegroundService(new Intent(MainActivity.this, SensorListener.class));
