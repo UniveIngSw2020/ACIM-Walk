@@ -187,10 +187,21 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void run() {
                 if(searchMatchViewModel.checkForMatchParticipation(userId)) {
-                    getActivity().startService(new Intent(getActivity(), SensorListener.class));
+/*                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                            .putInt("savedSteps", 0).apply();*/
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", false).apply();
+
+
+                    int temp = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps",0);
 
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                            .putInt("matchStartedAtSteps", temp).apply();
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                             .putInt("savedSteps", 0).apply();
+
+                    Log.i(TAG, "temp: " + temp);
+
+                    getActivity().startService(new Intent(getActivity(), SensorListener.class));
 
                     scheduler.shutdown();
                     getActivity().runOnUiThread(new Runnable() {

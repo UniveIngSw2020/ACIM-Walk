@@ -103,12 +103,17 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
                                 });
 
                         // Return to home, stop services and reset counters
-                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("savedSteps", 0).apply();
-                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("matchStartedAtSteps", 0).apply();
+/*                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                                .putInt("savedSteps", 0).apply();*/
+                        int nextMatchStartsAt = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps", 0);
+                        int offset = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
 
                         getActivity().stopService(new Intent(getActivity(), SensorListener.class));
+
+                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                                .putInt("matchStartedAtSteps", nextMatchStartsAt + offset).apply();
+                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", true).apply();
+                        Log.i(TAG, "nextMatchStartsAt -> " + nextMatchStartsAt);
 
 
                         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);

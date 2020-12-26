@@ -241,12 +241,13 @@ public class MatchRecapFragment extends Fragment {
                         });
 
                 // stopping steps service
-                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("savedSteps", 0).apply();
-                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("matchStartedAtSteps", 0).apply();
-
+                int nextMatchStartsAt = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps", 0);
+                int offset = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
+                Log.i(TAG, "nextMatchStartsAt -> " + nextMatchStartsAt);
                 context.stopService(new Intent(context, SensorListener.class));
+                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                        .putInt("matchStartedAtSteps", nextMatchStartsAt + offset).apply();
+                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", true).apply();
             }
         }.start();
     }

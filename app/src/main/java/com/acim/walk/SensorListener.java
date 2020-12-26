@@ -52,8 +52,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
     //Prove
     private static int currentMatchSteps;
-    private static boolean startedOnce = false;
-    private static boolean userInGame = false; // Boolean variable to control the repeating timer.
+    private  int startingSteps;
+
 
     @Nullable
     @Override
@@ -69,7 +69,36 @@ public class SensorListener extends Service implements SensorEventListener2 {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "SensorListener onCreate");
+
+    }
+
+
+    @Override
+    public int onStartCommand(final Intent intent, int flags, int startId) {
+
+        Log.i(TAG, "onStartCommand SERVICE");
+
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+        if (!prefs.getBoolean("matchFinished", true)) {
+
+            reRegisterSensor();
+            registerBroadcastReceiver();
+            updateIfNecessary();
+
+            long nextUpdate = Math.min(Util.getTomorrow(),
+                    System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR);
+            //if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
+            AlarmManager am =
+                    (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pi = PendingIntent
+                    .getService(getApplicationContext(), 2, new Intent(getApplicationContext(), SensorListener.class),
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+            am.set(AlarmManager.RTC, nextUpdate, pi);
+            am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);
+
+            return START_STICKY;
+        }
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -90,9 +119,8 @@ public class SensorListener extends Service implements SensorEventListener2 {
                 Log.d(TAG, String.format("Entra IF"));
             }*/
             currentMatchSteps = sensorSteps - startMatchSteps; // By subtracting the stepCounter variable from the Sensor event value - We start a new counting sequence from 0. Where the Sensor event value will increase, and stepCounter value will be only initialised once.
-            Log.i(TAG, String.format("current steps: %d", currentMatchSteps));
-            Log.i(TAG, String.format("start match steps: %d", startMatchSteps));
-            prefs.edit().putInt("savedSteps", currentMatchSteps);
+
+            prefs.edit().putInt("savedSteps", currentMatchSteps).apply();
             updateIfNecessary();
         }
     }
@@ -107,6 +135,13 @@ public class SensorListener extends Service implements SensorEventListener2 {
         Log.i(TAG, String.format("updateIfNecessary -> currentMatchSteps: %d", currentMatchSteps));
         if (currentMatchSteps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME) {
 
+            SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+            int startMatchSteps = prefs.getInt("matchStartedAtSteps", 0);
+            currentMatchSteps = sensorSteps - startMatchSteps;
+            prefs.edit().putInt("savedSteps", currentMatchSteps).apply();
+            Log.i(TAG, String.format("updateIfNecessary -> startMatchSteps: %d", startMatchSteps));
+
+
             DocumentReference userRef = dbContext.collection("users").document(mAuth.getUid());
 
             dbContext.runTransaction(new Transaction.Function<Void>() {
@@ -116,9 +151,10 @@ public class SensorListener extends Service implements SensorEventListener2 {
                     DocumentSnapshot userDoc = transaction.get(userRef);
                     if (userDoc.exists()) {
                         String matchId = userDoc.get("matchId").toString();
+                        DocumentReference matchRef = dbContext.collection("matches").document(matchId).collection("participants").document(mAuth.getUid());
+
                         transaction.update(userRef, "steps", currentMatchSteps);
 
-                        DocumentReference matchRef = dbContext.collection("matches").document(matchId).collection("participants").document(mAuth.getUid());
                         transaction.update(matchRef, "steps", currentMatchSteps);
                     }
 
@@ -128,6 +164,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.i(TAG, "Transaction completed successfully!");
+
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -139,9 +176,9 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
             lastSaveTime = System.currentTimeMillis();
 
-            showNotification(); // update notification
             return true;
         }
+        showNotification(); // update notification
         return false;
     }
 
@@ -150,73 +187,6 @@ public class SensorListener extends Service implements SensorEventListener2 {
         startForeground(NOTIFICATION_ID, getNotification(this));
     }
 
-    @Override
-    public int onStartCommand(final Intent intent, int flags, int startId) {
-
-        Log.i(TAG, "onStartCommand SERVICE");
-        reRegisterSensor();
-        registerBroadcastReceiver();
-        updateIfNecessary();
-
-        // if user is participating a match restart service every hour to save the current step count
-        DocumentReference userRef = dbContext.document("users/" + mAuth.getUid());
-        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful() && task.getResult().exists()) {
-                    if (task.getResult().getString("matchId") != null && !task.getResult().getString("matchId").equals(""))
-                        userInGame = true;
-
-
-                    SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
-                    currentMatchSteps = prefs.getInt("savedSteps", 0);
-
-                    if (!startedOnce) {
-                        startedOnce = true;
-                        getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("matchStartedAtSteps", sensorSteps).apply();
-                    }
-
-                    long nextUpdate = Math.min(Util.getTomorrow(),
-                            System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR);
-                    //if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
-                    AlarmManager am =
-                            (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-                    PendingIntent pi = PendingIntent
-                            .getService(getApplicationContext(), 2, new Intent(getApplicationContext(), SensorListener.class),
-                                    PendingIntent.FLAG_UPDATE_CURRENT);
-                    am.set(AlarmManager.RTC, nextUpdate, pi);
-                    am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);
-                    //return START_STICKY;
-                }
-            }
-        });
-        if (userInGame) {
-
-/*            SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
-            currentMatchSteps = prefs.getInt("savedSteps", 0);
-
-            int offset = getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
-            Log.i(TAG, "onStartCommand -> offset: " + offset);
-            if(sensorSteps == 0 || offset != 0){
-                getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("matchStartedAtSteps", sensorSteps).apply();
-            }
-
-            long nextUpdate = Math.min(Util.getTomorrow(),
-                    System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR);
-            //if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
-            AlarmManager am =
-                    (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-            PendingIntent pi = PendingIntent
-                    .getService(getApplicationContext(), 2, new Intent(this, SensorListener.class),
-                            PendingIntent.FLAG_UPDATE_CURRENT);
-            am.set(AlarmManager.RTC, nextUpdate, pi);
-            am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);*/
-            return START_STICKY;
-        }
-        return START_NOT_STICKY;
-    }
 
     @Override
     public void onTaskRemoved(final Intent rootIntent) {
@@ -237,11 +207,11 @@ public class SensorListener extends Service implements SensorEventListener2 {
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             manager.cancel(NOTIFICATION_ID);
-            startedOnce = false;
-            userInGame = false;
+
             stopService(new Intent(this, SensorListener.class));
             getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                    .edit().putInt("savedSteps", currentMatchSteps);
+                    .edit().putInt("savedSteps", currentMatchSteps).apply();
+
             sm.unregisterListener(this);
         } catch (Exception e) {
             if (BuildConfig.DEBUG)
