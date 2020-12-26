@@ -274,6 +274,11 @@ public class MatchRecapFragment extends Fragment {
                 context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("savedSteps", 0).apply();
 
+                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                        .putInt("savedSteps", 0).apply();
+                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                        .putInt("matchStartedAtSteps", 0).apply();
+
                 context.stopService(new Intent(context, SensorListener.class));
             }
         }.start();

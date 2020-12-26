@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +17,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class BootReceiver extends BroadcastReceiver {
+
+    private final String TAG = "BootReceiver";
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
@@ -36,6 +39,7 @@ public class BootReceiver extends BroadcastReceiver {
                             userRef.update("steps", 0);
                             prefs.edit().remove("correctShutdown").apply();
                             int savedSteps = prefs.getInt("savedSteps", 0);
+                            Log.i(TAG, "Saved steps: " + savedSteps);
                             if(steps < savedSteps){
                                 userRef.update("steps", savedSteps);
                             }
@@ -44,8 +48,6 @@ public class BootReceiver extends BroadcastReceiver {
                 });
             }
         }
-
         context.startForegroundService(new Intent(context, SensorListener.class));
-
     }
 }
