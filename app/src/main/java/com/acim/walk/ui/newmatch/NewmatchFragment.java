@@ -110,6 +110,7 @@ public class NewmatchFragment extends Fragment {
                     Boolean isHost = receivedObject.getBoolean(JSON_IS_HOST);
                     User receivedUser = new User(receivedEmail, receivedId, receivedUsername);
 
+                    // Check if current user has to be added in the game
                     if(!isHost) {
                         Boolean toAdd = true;
                         for (User user : participants) {
@@ -139,7 +140,6 @@ public class NewmatchFragment extends Fragment {
             @Override
             public void onLost(Message message) {
                 System.out.println("ERROR: " + new String(message.getContent()));
-                //opponentsIds.add(new String(message.getContent()));
             }
         };
         subscribe();
@@ -153,7 +153,7 @@ public class NewmatchFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_newmatch, container, false);
 
-        // Get userID and userEmail from MainActivity function, getUserID(), getUserEmail()
+        // Get user infos from MainActivity function and create a new User object
         MainActivity activity = (MainActivity) getActivity();
         userId = activity != null ? activity.getUserID() : "NaN";
         userEmail = activity != null ? activity.getUserEmail() : "NaN";
@@ -161,10 +161,12 @@ public class NewmatchFragment extends Fragment {
         User currentUser = new User(userEmail, userId, username, 0);
 
         userIdTxt = root.findViewById(R.id.userID_text);
-        startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
 
+        // Disable start match button. It can be enabled only when user choose the length of the game
+        startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
         startMatchBtn.setEnabled(false);
 
+        // Add it self to the list of participants
         participants.add(currentUser);
 
         // setting up arguments to pass to listview
@@ -181,7 +183,7 @@ public class NewmatchFragment extends Fragment {
         // appending data source to listview
         opponentsList.setAdapter(adapter);
 
-        // this JSON object will store all user's info
+        // this JSON object will store all user's info and it will be sent to other players using nearby
         JSONObject userInfo = new JSONObject();
         try {
             userInfo.put(JSON_USER_ID, userId);
@@ -199,8 +201,9 @@ public class NewmatchFragment extends Fragment {
 
         startMatchBtn.setOnClickListener(x -> {
             if (canHost) {
-                EditText gameTime = root.findViewById(R.id.gameDuration_time);
 
+                // Retrieve game duration and the timestamp when the game is ended
+                EditText gameTime = root.findViewById(R.id.gameDuration_time);
                 Date endDate = newMatchViewModel.getEndDate(gameTime);
 
                 String matchId = newMatchViewModel.createMatch(participants, endDate);
@@ -234,7 +237,6 @@ public class NewmatchFragment extends Fragment {
                 NavController navController = navHostFragment.getNavController();
                 navController.navigate(R.id.nav_matchrecap);
 
-
             } else {
                 Util.toast(getActivity(), "Qualcuno sta cercando di creare una gara con gli stessi partecipanti!", false);
             }
@@ -247,7 +249,7 @@ public class NewmatchFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // Method used to check if user has insert a duration for his game
+        // Method used to check if user has insert a duration for his game. If he has insert a duration, enable the button to start match
         EditText gameTime = getActivity().findViewById(R.id.gameDuration_time);
         gameTime.addTextChangedListener(new TextWatcher() {
             @Override

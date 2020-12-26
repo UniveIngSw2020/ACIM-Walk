@@ -28,5 +28,6 @@ public class MatchRecapViewModel extends ViewModel{
     public MatchRecapViewModel() {
         db = FirebaseFirestore.getInstance();
     }
+
 }
 

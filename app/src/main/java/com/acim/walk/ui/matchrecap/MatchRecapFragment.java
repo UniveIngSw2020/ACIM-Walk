@@ -16,30 +16,28 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
+import com.acim.walk.ui.CloseAppDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MatchRecapFragment extends Fragment {
 
@@ -54,6 +52,9 @@ public class MatchRecapFragment extends Fragment {
 
     private String userId;
     private long timeInMillis;
+
+    // An ExecutorService that can schedule commands to run after a given delay, or to execute periodically
+    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     /*
      * when the match is over, this will become TRUE
@@ -76,20 +77,24 @@ public class MatchRecapFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
+        /*
+         * Callback used when user press go back button. In this case user can go back to previous page
+         * but he can only close application. So when user press go back button a dialog will be opened
+         * and ask to user if he wants to close application
+         *
+         */
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
                 // Handle the back button even
                 Log.d("BACKBUTTON", "Back button clicks");
+
+                CloseAppDialog closeAppDialog = new CloseAppDialog();
+                closeAppDialog.show(getActivity().getSupportFragmentManager(), "");
             }
         };
 
         requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
-
-        // getting access to the menu
-        NavigationView nav = ((MainActivity)getActivity()).getNavigation();
-        // hiding Home option on this fragment
-        nav.getMenu().findItem(R.id.nav_home).setVisible(false);
     }
 
 
@@ -98,6 +103,9 @@ public class MatchRecapFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.match_recap_fragment, container, false);
 
+        MainActivity activity = (MainActivity)getActivity();
+        userId = activity.getUserID();
+
         mViewModel = new ViewModelProvider(this).get(MatchRecapViewModel.class);
 
         // Set global variables
@@ -105,11 +113,6 @@ public class MatchRecapFragment extends Fragment {
         timer_txt = root.findViewById(R.id.timer_txt);
         showRanking = root.findViewById(R.id.ranking_btn);
         leaveMatch = root.findViewById(R.id.abandonMatch_btn);
-
-        MainActivity activity = (MainActivity)getActivity();
-        userId = activity.getUserID();
-
-        System.out.println("UID UTENTE: " + userId);
 
         // Retrieve from db the remaining time in ms, then show on timer_txt
         DocumentReference userRef = db.collection("users").document(userId);
@@ -139,7 +142,6 @@ public class MatchRecapFragment extends Fragment {
                                 // Using these two var, calculate timer
                                 timeInMillis = remainingTime * 1000;
 
-                                System.out.println("TIME IN MILLIS: " + timeInMillis);
                                 startCountDown(getActivity());
                             }
                         }
@@ -147,6 +149,46 @@ public class MatchRecapFragment extends Fragment {
                 }
             }
         });
+
+        // Set scheduler that every x seconds update text view that contains the number of steps made by the user.
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+
+                // Go to firebase match and retrieve user steps, then update the textview
+                db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+
+                                    // Retrieve matchId
+                                    String matchId = (String) task.getResult().getData().get("matchId");
+
+                                    if (matchId == null) return;
+
+                                    // Retrieve steps from matches collection and update textview
+                                    db.collection("matches")
+                                            .document(matchId) // Retrieve the current match infos
+                                            .collection("participants") // Retrieve the participants document
+                                            .document(userId) // Retrieve the user's infos
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    if(task.isSuccessful())  {
+                                                        String steps = task.getResult().getData().get("steps").toString();
+                                                        steps_txt.setText(steps);
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                        });
+            }
+        }, 0, 1, TimeUnit.SECONDS);
 
 
         showRanking.setOnClickListener(new View.OnClickListener() {
@@ -166,14 +208,27 @@ public class MatchRecapFragment extends Fragment {
             public void onClick(View view) {
                 // if match is over, takes user back to home
                 if(matchIsOver) {
-                    //TODO (SC): reset counter in user document (in users collection). Stop service and reset local step counter.
-                    DocumentReference userRef = db.collection("matches").document(userId);
-                    userRef.update("steps", 0);
 
+                    //Clear matchId reference on user document
+                    WriteBatch batch = db.batch();
+                    DocumentReference userDoc = db.collection("users").document(userId);
+                    batch.update(userDoc, "matchId", null);
+                    batch.update(userDoc, "steps", 0);
+
+                    // Commit the batch
+                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.d(TAG, "User is removed from match, he completed it!");
+                        }
+                    });
+
+                    // Stop pedometer service
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                             .putInt("savedSteps", 0).apply();
                     getActivity().stopService(new Intent(getActivity(), SensorListener.class));
 
+                    // Redirect user to home page
                     NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
                     NavController navController = navHostFragment.getNavController();
                     navController.navigate(R.id.nav_home);
@@ -194,6 +249,7 @@ public class MatchRecapFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
+    // Function used to handle timer events as start or finish and timer ticking
     private void startCountDown(Context context) {
         countDownTimer = new CountDownTimer(timeInMillis, 1000) {
             @Override

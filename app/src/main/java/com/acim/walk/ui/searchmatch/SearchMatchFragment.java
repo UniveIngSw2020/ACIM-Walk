@@ -58,6 +58,8 @@ public class SearchMatchFragment extends Fragment {
 
     private MessageListener idsListener;
     private Message userIdMessage;
+
+    // An ExecutorService that can schedule commands to run after a given delay, or to execute periodically
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     // listview reference
@@ -67,7 +69,6 @@ public class SearchMatchFragment extends Fragment {
     private ArrayAdapter<String> adapter;
 
     private HashSet<User> participants = new HashSet<>();
-    ;
 
     private String userId = null;
     private String username = null;
@@ -128,7 +129,6 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void onLost(Message message) {
                 System.out.println("ERROR: " + new String(message.getContent()));
-                //opponentsIds.add(new String(message.getContent()));
             }
         };
         subscribe();
@@ -142,7 +142,7 @@ public class SearchMatchFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_searchmatch, container, false);
 
-        // Get userID and userEmail from MainActivity function, getUserID(), getUserEmail()
+        // Get user infos from MainActivity function and create a new User object
         MainActivity activity = (MainActivity) getActivity();
         userId = activity != null ? activity.getUserID() : "NaN";
         userEmail = activity != null ? activity.getUserEmail() : "NaN";
@@ -167,7 +167,7 @@ public class SearchMatchFragment extends Fragment {
         // appending data source to listview
         opponentsList.setAdapter(adapter);
 
-        // this JSON object will store all user's info
+        // this JSON object will store all user's info and it will be sent to other players using nearby
         JSONObject userInfo = new JSONObject();
         try {
             userInfo.put(JSON_ID, userId);
