@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -28,6 +29,7 @@ import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
+import com.acim.walk.ui.CloseAppDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,6 +56,25 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+
+        /*
+         * Callback used when user press go back button. In this case user can go back to previous page
+         * but he can only close application. So when user press go back button a dialog will be opened
+         * and ask to user if he wants to close application
+         *
+         */
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                // Handle the back button even
+                Log.d("BACKBUTTON", "Back button clicks");
+
+                CloseAppDialog closeAppDialog = new CloseAppDialog();
+                closeAppDialog.show(getActivity().getSupportFragmentManager(), "");
+            }
+        };
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, callback);
 
         //First check if logged in user participates a match. If yes starts the service to enable sensor to count steps and to show notification
         //TODO (SC): check correctness
