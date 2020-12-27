@@ -33,6 +33,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Transaction;
 
+import static androidx.lifecycle.Lifecycle.State.STARTED;
+
 public class SensorListener extends Service implements SensorEventListener2 {
 
     private final String TAG = "SensorListenerClass";
@@ -52,7 +54,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
     //Prove
     private static int currentMatchSteps;
-    private  int startingSteps;
+    private int startMatchSteps;
 
 
     @Nullable
@@ -69,9 +71,10 @@ public class SensorListener extends Service implements SensorEventListener2 {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        startMatchSteps = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
+        currentMatchSteps = 0;
+        startForeground(NOTIFICATION_ID, getNotification(getApplicationContext()));
     }
-
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
@@ -81,11 +84,12 @@ public class SensorListener extends Service implements SensorEventListener2 {
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
         if (!prefs.getBoolean("matchFinished", true)) {
 
+            startMatchSteps = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
             reRegisterSensor();
             registerBroadcastReceiver();
             updateIfNecessary();
 
-            long nextUpdate = Math.min(Util.getTomorrow(),
+/*            long nextUpdate = Math.min(Util.getTomorrow(),
                     System.currentTimeMillis() + AlarmManager.INTERVAL_HALF_HOUR);
             //if (BuildConfig.DEBUG) Logger.log("next update: " + new Date(nextUpdate).toLocaleString());
             AlarmManager am =
@@ -94,7 +98,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
                     .getService(getApplicationContext(), 2, new Intent(getApplicationContext(), SensorListener.class),
                             PendingIntent.FLAG_UPDATE_CURRENT);
             am.set(AlarmManager.RTC, nextUpdate, pi);
-            am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);
+            am.set(AlarmManager.RTC, AlarmManager.INTERVAL_HOUR, pi);*/
 
             return START_STICKY;
         }
@@ -103,23 +107,19 @@ public class SensorListener extends Service implements SensorEventListener2 {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.i(TAG, "onSensorChanged");
         if (event.values[0] > Integer.MAX_VALUE) {
-            if (BuildConfig.DEBUG)
-                Log.i(TAG + " - onSensorChanged", "probably not a real value: " + event.values[0]);
-            return;
+            Log.i(TAG + " - onSensorChanged", "probably not a real value: " + event.values[0]);
         } else {
             sensorSteps = (int) event.values[0];
 
             SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
-            int startMatchSteps = prefs.getInt("matchStartedAtSteps", 0);
-            // -The efficient way of starting a new step counting sequence.-
-            /*if (stepCounter == 0) { // If the stepCounter is in its initial value, then...
-                stepCounter = (int) event.values[0]; // Assign the StepCounter Sensor event value to it.
-                Log.d(TAG, String.format("Entra IF"));
-            }*/
-            currentMatchSteps = sensorSteps - startMatchSteps; // By subtracting the stepCounter variable from the Sensor event value - We start a new counting sequence from 0. Where the Sensor event value will increase, and stepCounter value will be only initialised once.
-
+            startMatchSteps = prefs.getInt("matchStartedAtSteps", 0);
+            Log.i(TAG, String.format("onSensorChanged -> startMatchSteps: %d", startMatchSteps));
+            if (sensorSteps - startMatchSteps > currentMatchSteps) {
+                Log.i(TAG, String.format("onSensorChanged -> startMatchSteps: %d", startMatchSteps));
+                currentMatchSteps = sensorSteps - startMatchSteps; // By subtracting the stepCounter variable from the Sensor event value - We start a new counting sequence from 0. Where the Sensor event value will increase, and stepCounter value will be only initialised once.
+            }
+            Log.i(TAG, String.format("onSensorChanged -> startMatchSteps: %d", startMatchSteps));
             prefs.edit().putInt("savedSteps", currentMatchSteps).apply();
             updateIfNecessary();
         }
@@ -131,17 +131,18 @@ public class SensorListener extends Service implements SensorEventListener2 {
     }
 
     private boolean updateIfNecessary() {
-        Log.i(TAG, String.format("updateIfNecessary -> sensorSteps: %d", sensorSteps));
-        Log.i(TAG, String.format("updateIfNecessary -> currentMatchSteps: %d", currentMatchSteps));
+
         if (currentMatchSteps > 0 && System.currentTimeMillis() > lastSaveTime + SAVE_OFFSET_TIME) {
 
             SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
-            int startMatchSteps = prefs.getInt("matchStartedAtSteps", 0);
-            currentMatchSteps = sensorSteps - startMatchSteps;
+            Log.i(TAG, String.format("updateIfNecessary -> startMatchSteps: %d", startMatchSteps));
+            if (sensorSteps - startMatchSteps > currentMatchSteps) {
+                currentMatchSteps = sensorSteps - startMatchSteps;
+            }
             prefs.edit().putInt("savedSteps", currentMatchSteps).apply();
             Log.i(TAG, String.format("updateIfNecessary -> startMatchSteps: %d", startMatchSteps));
-
-
+            Log.i(TAG, String.format("updateIfNecessary -> currentMatchSteps: %d", currentMatchSteps));
+            Log.i(TAG, String.format("updateIfNecessary -> sensorSteps: %d", sensorSteps));
             DocumentReference userRef = dbContext.collection("users").document(mAuth.getUid());
 
             dbContext.runTransaction(new Transaction.Function<Void>() {
@@ -207,10 +208,10 @@ public class SensorListener extends Service implements SensorEventListener2 {
             SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             manager.cancel(NOTIFICATION_ID);
-
+            MainActivity.isServiceStopped = true;
             stopService(new Intent(this, SensorListener.class));
-            getSharedPreferences("pedometer", Context.MODE_PRIVATE)
-                    .edit().putInt("savedSteps", currentMatchSteps).apply();
+            /*getSharedPreferences("pedometer", Context.MODE_PRIVATE)
+                    .edit().putInt("savedSteps", currentMatchSteps).apply();*/
 
             sm.unregisterListener(this);
         } catch (Exception e) {
@@ -266,17 +267,12 @@ public class SensorListener extends Service implements SensorEventListener2 {
             //if (BuildConfig.DEBUG) Logger.log(e);
             e.printStackTrace();
         }
-
-/*        if (BuildConfig.DEBUG) {
-            //Logger.log("step sensors: " + sm.getSensorList(Sensor.TYPE_STEP_COUNTER).size());
-            if (sm.getSensorList(Sensor.TYPE_STEP_COUNTER).size() < 1) return; // emulator
-            //Logger.log("default: " + sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER).getName());
-        }*/
-
         // enable batching with delay of max 5 min
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
-                SensorManager.SENSOR_DELAY_NORMAL, (int) (6000000));
+                SensorManager.SENSOR_DELAY_FASTEST, (int) (6000000));
     }
 
-
+    public static void setCurrentSteps(int steps){
+        currentMatchSteps = steps;
+    }
 }

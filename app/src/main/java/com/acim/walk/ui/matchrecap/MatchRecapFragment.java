@@ -298,12 +298,15 @@ public class MatchRecapFragment extends Fragment {
 
                 // stopping steps service
                 int nextMatchStartsAt = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps", 0);
-                int offset = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
+                nextMatchStartsAt += context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
+                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", true).apply();
                 Log.i(TAG, "nextMatchStartsAt -> " + nextMatchStartsAt);
                 context.stopService(new Intent(context, SensorListener.class));
                 context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("matchStartedAtSteps", nextMatchStartsAt + offset).apply();
-                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", true).apply();
+                        .putInt("matchStartedAtSteps", nextMatchStartsAt).apply();
+                context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                        .putInt("savedSteps", 0).apply();
+
             }
         }.start();
     }

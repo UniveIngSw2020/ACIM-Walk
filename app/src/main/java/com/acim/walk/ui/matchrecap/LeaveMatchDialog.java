@@ -106,13 +106,14 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
 /*                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                                 .putInt("savedSteps", 0).apply();*/
                         int nextMatchStartsAt = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps", 0);
-                        int offset = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
-
+                        nextMatchStartsAt += getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
+                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", true).apply();
                         getActivity().stopService(new Intent(getActivity(), SensorListener.class));
 
                         getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                                .putInt("matchStartedAtSteps", nextMatchStartsAt + offset).apply();
-                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", true).apply();
+                                .putInt("matchStartedAtSteps", nextMatchStartsAt).apply();
+                        getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                                .putInt("savedSteps", 0).apply();
                         Log.i(TAG, "nextMatchStartsAt -> " + nextMatchStartsAt);
 
 

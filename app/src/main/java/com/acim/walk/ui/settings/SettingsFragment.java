@@ -1,5 +1,6 @@
 package com.acim.walk.ui.settings;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.acim.walk.AuthActivity;
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
+import com.acim.walk.SensorListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -114,6 +116,16 @@ public class SettingsFragment extends Fragment {
 
                 // check is user is already logged in, if yes switch to home page
                 if(user == null){
+
+                    int nextMatchStartsAt = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps", 0);
+                    int offset = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("matchStartedAtSteps", 0);
+
+                    getActivity().stopService(new Intent(getActivity(), SensorListener.class));
+
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                            .putInt("matchStartedAtSteps", nextMatchStartsAt + offset).apply();
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", true).apply();
+
                     // taking logged user to MainActivity
                     Intent loginIntent = new Intent(getActivity(), AuthActivity.class);
 

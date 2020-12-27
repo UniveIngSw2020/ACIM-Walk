@@ -28,25 +28,30 @@ public class BootReceiver extends BroadcastReceiver {
         FirebaseFirestore dbf = FirebaseFirestore.getInstance();
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         if (mAuth.getCurrentUser() != null) {
-            if (!prefs.getBoolean("correctShutdown", false)) {
-                // can we at least recover some steps?
                 DocumentReference userRef = dbf.collection("users").document(mAuth.getUid());
                 userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             int steps = Math.toIntExact(task.getResult().getLong("steps"));
-                            userRef.update("steps", 0);
+
                             prefs.edit().remove("correctShutdown").apply();
+
+                            //sensor counter is set to 0 after every reboot
+                            prefs.edit().putInt("matchStartedAtSteps", 0).apply();
                             int savedSteps = prefs.getInt("savedSteps", 0);
-                            Log.i(TAG, "Saved steps: " + savedSteps);
-                            if(steps < savedSteps){
+                            Log.i(TAG, "Saved steps: " + savedSteps + " DB Steps: " + steps);
+                            if (steps < savedSteps) {
                                 userRef.update("steps", savedSteps);
+                                SensorListener.setCurrentSteps(savedSteps);
+                            } else {
+                                prefs.edit().putInt("savedSteps", steps).apply();
+                                SensorListener.setCurrentSteps(steps);
                             }
+
                         }
                     }
                 });
-            }
         }
         context.startForegroundService(new Intent(context, SensorListener.class));
     }

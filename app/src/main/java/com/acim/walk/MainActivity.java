@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity{
     private String userEmail = "";
     private String username = "";
     private Boolean hasGame = false;
-    private Boolean isServiceStopped = true;
+    public static Boolean isServiceStopped = true;
 
 
     @Override
@@ -110,22 +110,12 @@ public class MainActivity extends AppCompatActivity{
             username = mAuth.getCurrentUser().getDisplayName();
         }
 
-        if(isServiceStopped){
-            DocumentReference userRef = db.collection("users").document(userID);
-            userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful() && task.getResult().exists()) {
-                        hasGame = task.getResult().getString("matchId") != null && !task.getResult().getString("matchId").equals("") ? true : false;
-                        Log.i(TAG, "USER PARTICIPATES A MATCH");
-                    }
-                }
-            });
-        }
-
-        if (hasGame) {
-            startForegroundService(new Intent(MainActivity.this, SensorListener.class));
-            isServiceStopped = false;
+        if(isServiceStopped) {
+            SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
+            if (!prefs.getBoolean("matchFinished", true)) {
+                startForegroundService(new Intent(MainActivity.this, SensorListener.class));
+                isServiceStopped = false;
+            }
         }
 
         setContentView(R.layout.activity_main);

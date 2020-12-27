@@ -192,16 +192,15 @@ public class SearchMatchFragment extends Fragment {
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", false).apply();
 
 
-                    int temp = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps",0);
+/*                    int temp = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps",0);
 
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                            .putInt("matchStartedAtSteps", temp).apply();
+                            .putInt("matchStartedAtSteps", temp).apply();*/
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                             .putInt("savedSteps", 0).apply();
 
-                    Log.i(TAG, "temp: " + temp);
 
-                    getActivity().startService(new Intent(getActivity(), SensorListener.class));
+                    getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
 
                     scheduler.shutdown();
                     getActivity().runOnUiThread(new Runnable() {
