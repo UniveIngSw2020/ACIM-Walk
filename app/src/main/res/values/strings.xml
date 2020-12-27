@@ -37,7 +37,24 @@
     <!-- strings used for fragment_login -->
     <string name="loginText">Login</string>
     <string name="signUpLabel">Oppure Registrati</string>
-    <string name="emailText">Login</string>
-    <string name="passwordText">Login</string>
+    <string name="emailText">email</string>
+    <string name="passwordText">password</string>
+
+    <!-- strings used for fragment_signin -->
+    <string name="signUpButton">sign up</string>
+    <string name="email_signup">email</string>
+    <string name="password_signup">password</string>
+    <string name="username_signup">username</string>
+    <string name="lbl_signup">Oppure Loggati</string>
+
+    <!-- strings used for fragment_recap_fragment -->
+    <string name="tempoRimasto">Tempo rimasto</string>
+    <string name="passi">Passi</string>
+    <string name="steps">123</string>
+    <string name="classificaPartita">CLASSIFICA PARTITA</string>
+    <string name="abbandonaPartita">ABBANDONA PARTITA</string>
+    <string name="timer">00:00:00</string>
+
+
 
 </resources>
