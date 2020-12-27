@@ -55,6 +55,9 @@
     <string name="abbandonaPartita">ABBANDONA PARTITA</string>
     <string name="timer">00:00:00</string>
 
-
+    <!-- strings used for ranking_recyclerview_row -->
+    <string name="rankingPosition">Posizione</string>
+    <string name="rankingUsername">Username</string>
+    <string name="rankingSteps">Passi</string>
 
 </resources>
