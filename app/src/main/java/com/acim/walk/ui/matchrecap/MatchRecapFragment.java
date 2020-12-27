@@ -106,6 +106,12 @@ public class MatchRecapFragment extends Fragment {
         MainActivity activity = (MainActivity)getActivity();
         userId = activity.getUserID();
 
+        // getting access to the menu
+        NavigationView nav = activity.getNavigation();
+        // hiding some options on this fragment (Home and NewMatch)
+        nav.getMenu().findItem(R.id.nav_home).setVisible(false);
+        nav.getMenu().findItem(R.id.nav_newmatch).setVisible(false);
+
         mViewModel = new ViewModelProvider(this).get(MatchRecapViewModel.class);
 
         // Set global variables
@@ -179,8 +185,18 @@ public class MatchRecapFragment extends Fragment {
                                                 @Override
                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                     if(task.isSuccessful())  {
-                                                        String steps = task.getResult().getData().get("steps").toString();
-                                                        steps_txt.setText(steps);
+                                                        DocumentSnapshot document = task.getResult();
+                                                        // the query returned SOMETHING
+                                                        if(document.exists()) {
+                                                            Log.d("MRECAP", task.getResult().getData().toString());
+
+                                                            String steps = task.getResult().getData().get("steps").toString();
+                                                            steps_txt.setText(steps);
+                                                        }
+                                                        // result is NULL, the query returned nothing
+                                                        else {
+                                                            Log.d("MRECAP", "NON VA");
+                                                        }
                                                     }
                                                 }
                                             });
@@ -269,32 +285,6 @@ public class MatchRecapFragment extends Fragment {
 
                 leaveMatch.setText("Home");
                 timer_txt.setText("Time's over!");
-
-                // Remove user matchId, because he finish this match
-                db.collection("users")
-                        .document(userId)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if(task.isSuccessful()) {
-
-                                    WriteBatch batch = db.batch();
-                                    //Clear matchId reference on user document
-                                    DocumentReference userDoc = db.collection("users").document(userId);
-                                    batch.update(userDoc, "matchId", null);
-                                    batch.update(userDoc, "steps", 0);
-
-                                    // Commit the batch
-                                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            Log.d(TAG, "User added to 'users' collection!");
-                                        }
-                                    });
-                                }
-                            }
-                        });
 
                 // stopping steps service
                 int nextMatchStartsAt = context.getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps", 0);
