@@ -13,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -40,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 public class NewmatchFragment extends Fragment {
@@ -161,7 +158,7 @@ public class NewmatchFragment extends Fragment {
 
 
         // Disable start match button. It can be enabled only when user choose the length of the game
-        startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
+        startMatchBtn = root.findViewById(R.id.newmatch_start_button);
         startMatchBtn.setEnabled(false);
 
         // Add it self to the list of participants

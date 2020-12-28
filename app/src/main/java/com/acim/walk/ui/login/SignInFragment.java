@@ -15,8 +15,6 @@ import com.acim.walk.Model.User;
 import com.acim.walk.R;
 import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,9 +23,6 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -148,9 +143,9 @@ public class SignInFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         // getting references
-        final EditText email = getView().findViewById(R.id.email_signup_editext);
-        final EditText password = getView().findViewById(R.id.password_signup_editext);
-        final EditText username = getView().findViewById(R.id.username_signup_editext);
+        final EditText email = getView().findViewById(R.id.signup_email);
+        final EditText password = getView().findViewById(R.id.signup_password);
+        final EditText username = getView().findViewById(R.id.signup_username);
 
         /*
          * signup button onClick handler

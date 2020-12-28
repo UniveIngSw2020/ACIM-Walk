@@ -1,16 +1,12 @@
 package com.acim.walk.ui.login;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
@@ -117,8 +113,8 @@ public class LoginFragment extends Fragment {
         }
 
         // referencing objects
-        final EditText email = getView().findViewById(R.id.email_editext);
-        final EditText password = getView().findViewById(R.id.password_editext);
+        final EditText email = getView().findViewById(R.id.login_email);
+        final EditText password = getView().findViewById(R.id.login_password);
 
         /*
          * login button onClick handler
@@ -146,7 +142,7 @@ public class LoginFragment extends Fragment {
          * label below the login button onClick handler
          * it takes user to sign up fragment
          */
-        view.findViewById(R.id.signup_label).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.login_signup_label).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavHostFragment.findNavController(LoginFragment.this)

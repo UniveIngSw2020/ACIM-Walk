@@ -115,10 +115,10 @@ public class MatchRecapFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(MatchRecapViewModel.class);
 
         // Set global variables
-        steps_txt = root.findViewById(R.id.steps_txt);
-        timer_txt = root.findViewById(R.id.timer_txt);
-        showRanking = root.findViewById(R.id.ranking_btn);
-        leaveMatch = root.findViewById(R.id.abandonMatch_btn);
+        steps_txt = root.findViewById(R.id.matchrecap_steps_text);
+        timer_txt = root.findViewById(R.id.matchrecap_timer_text);
+        showRanking = root.findViewById(R.id.matchrecap_ranking_button);
+        leaveMatch = root.findViewById(R.id.matchrecap_quit_button);
 
         // Retrieve from db the remaining time in ms, then show on timer_txt
         DocumentReference userRef = db.collection("users").document(userId);

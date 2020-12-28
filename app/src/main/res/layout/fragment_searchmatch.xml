@@ -8,13 +8,13 @@
     tools:context=".ui.searchmatch.SearchMatchFragment">
 
     <TextView
-        android:id="@+id/textShowUserId2"
+        android:id="@+id/newmatch_participants_label"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/opponentsID"
+        android:layout_height="wrap_content"
+        android:text="@string/participants"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="21sp"
+        app:layout_constraintBottom_toTopOf="@+id/opponents_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,12 +22,15 @@
     <ListView
         android:id="@+id/opponents_list"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textShowUserId2" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.31" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

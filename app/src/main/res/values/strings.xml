@@ -6,9 +6,27 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
 
+    <!-- strings used for fragment_login -->
+    <string name="login_button">Login</string>
+    <string name="login_signup_label">Non hai un account? Registrati</string>
+
+    <!-- strings used for fragment_signin -->
+    <string name="signin_button">Registrati</string>
+    <string name="username_text">Nome utente</string>
+    <string name="signin_login_label">Accedi con il tuo account</string>
+
+    <!-- strings used for fragment_signin and fragment_login -->
+    <string name="email_text">Indirizzo email</string>
+    <string name="password_text">Password</string>
+
+    <!-- strings used for fragment_home -->
     <string name="menu_home">Home</string>
-    <string name="menu_newmatch">Crea partita</string>
-    <string name="menu_searchmatch">Cerca partita</string>
+    <string name="home_welcome">Benvenuto in Walk!</string>
+    <string name="home_summary">Sfida chiunque per dimostare chi è il maratoneta migliore.
+    Potrai scegliere se partecipare ad una partita, oppure se vuoi potrai crearne tu una, scegliendo la durata
+    della partita.</string>
+    <string name="menu_newmatch">Crea una partita</string>
+    <string name="menu_searchmatch">Cerca una partita</string>
     <string name="menu_settings">Impostazioni</string>
     <string name="title_activity_auth">Walk!</string>
 
@@ -21,43 +39,29 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
-    <!-- strings used for fragment_searchmatch -->
-    <string name="opponentsID">Opponents ID:</string>
-    <string name="userID">User ID:</string>
-    <string name="startMatch">Walk!</string>
-    <string name="logout">Esci</string>
-    <string name="setTime">Minuti partita</string>
-
     <!-- strings used for fragment_newmatch -->
-    <string name="newmatchStepsCounter">Numero di passsi effettuati:</string>
+    <string name="newmatch_time_text">Inserisci la lunghezza della partita:</string>
+    <string name="newmatch_start">Walk!</string>
+
+    <!-- strings used for fragment_searchmatch and fragment_newmatch -->
+    <string name="participants">Partecipanti:</string>
 
     <!-- strings used for fragment_show_ranking -->
-    <string name="rankingText">Classifica</string>
+    <string name="showranking_rank">Classifica</string>
 
-    <!-- strings used for fragment_login -->
-    <string name="loginText">Login</string>
-    <string name="signUpLabel">Oppure Registrati</string>
-    <string name="emailText">email</string>
-    <string name="passwordText">password</string>
-
-    <!-- strings used for fragment_signin -->
-    <string name="signUpButton">sign up</string>
-    <string name="email_signup">email</string>
-    <string name="password_signup">password</string>
-    <string name="username_signup">username</string>
-    <string name="lbl_signup">Oppure Loggati</string>
-
-    <!-- strings used for fragment_recap_fragment -->
-    <string name="tempoRimasto">Tempo rimasto</string>
-    <string name="passi">Passi</string>
-    <string name="steps">123</string>
-    <string name="classificaPartita">CLASSIFICA PARTITA</string>
-    <string name="abbandonaPartita">ABBANDONA PARTITA</string>
-    <string name="timer">00:00:00</string>
+    <!-- strings used for match_recap_fragment -->
+    <string name="matchrecap_timeleft_label">Tempo rimasto</string>
+    <string name="matchrecap_steps_label">Passi effettuati</string>
+    <string name="matchrecap_steps">0</string>
+    <string name="matchrecap_ranking">CLASSIFICA</string>
+    <string name="matchrecap_quit">ABBANDONA PARTITA</string>
+    <string name="matchrecap_timer">00:00:00</string>
 
     <!-- strings used for ranking_recyclerview_row -->
     <string name="rankingPosition">Posizione</string>
     <string name="rankingUsername">Username</string>
     <string name="rankingSteps">Passi</string>
+
+    <string name="logout">Esci</string>
 
 </resources>

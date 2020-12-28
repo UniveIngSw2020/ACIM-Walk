@@ -10,11 +10,11 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
 
 
     <TextView
-        android:id="@+id/timer_txt"
+        android:id="@+id/matchrecap_timer_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/timer"
+        android:text="@string/matchrecap_timer"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,11 +25,12 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/tempoRimasto"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/matchrecap_timeleft_label"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="21sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -38,19 +39,21 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="@string/passi"
+        android:layout_marginTop="48dp"
+        android:text="@string/matchrecap_steps_label"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textSize="21sp"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timer_txt" />
+        app:layout_constraintTop_toBottomOf="@+id/matchrecap_timer_text" />
 
     <TextView
-        android:id="@+id/steps_txt"
+        android:id="@+id/matchrecap_steps_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/steps"
+        android:layout_marginTop="16dp"
+        android:text="@string/matchrecap_steps"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,29 +61,29 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
 
 
     <Button
-        android:id="@+id/ranking_btn"
+        android:id="@+id/matchrecap_ranking_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/classificaPartita"
+        android:text="@string/matchrecap_ranking"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/steps_txt" />
+        app:layout_constraintTop_toBottomOf="@+id/matchrecap_steps_text"
+        app:layout_constraintVertical_bias="0.274" />
 
     <Button
-        android:id="@+id/abandonMatch_btn"
+        android:id="@+id/matchrecap_quit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
-        android:text="@string/abbandonaPartita"
+        android:text="@string/matchrecap_quit"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ranking_btn" />
-
-
+        app:layout_constraintTop_toBottomOf="@+id/matchrecap_ranking_button"
+        app:layout_constraintVertical_bias="0.16" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
