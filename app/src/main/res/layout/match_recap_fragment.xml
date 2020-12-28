@@ -61,12 +61,12 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
         android:id="@+id/ranking_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:text="@string/classificaPartita"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/abandonMatch_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/steps_txt" />
 
     <Button
         android:id="@+id/abandonMatch_btn"
@@ -77,7 +77,8 @@ tools:context=".ui.matchrecap.MatchRecapFragment">
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ranking_btn" />
 
 
 

@@ -54,8 +54,6 @@ public class SearchMatchFragment extends Fragment {
 
     private SearchMatchViewModel searchMatchViewModel;
 
-    private TextView userIdTxt;
-
     private MessageListener idsListener;
     private Message userIdMessage;
 
@@ -149,8 +147,6 @@ public class SearchMatchFragment extends Fragment {
         username = activity != null ? activity.getUsername() : "NaN";
         User currentUser = new User(userEmail, userId, username, 0);
 
-        userIdTxt = root.findViewById(R.id.userID_text);
-
         participants.add(currentUser);
 
         // setting up arguments to pass to listview
@@ -180,8 +176,6 @@ public class SearchMatchFragment extends Fragment {
 
         // sending JSON object to nearby devices
         publish(userInfo.toString());
-        // Show on screen own user ID
-        userIdTxt.setText(userId);
 
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override

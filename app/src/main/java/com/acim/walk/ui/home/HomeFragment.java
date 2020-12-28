@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
                 new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        currentStepsTxt = root.findViewById(R.id.text_home);
+        // currentStepsTxt = root.findViewById(R.id.text_home);
         userInfoTxt = root.findViewById(R.id.userInfoTxt);
         newMatchBtn = root.findViewById(R.id.newMatchBtn);
         searchMatchBtn = root.findViewById(R.id.searchMatchBtn);
@@ -138,7 +138,10 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                currentStepsTxt.setText(s);
+                /*
+                 * there is no need to update the steps on this fragment
+                 */
+                // currentStepsTxt.setText(s);
             }
         });
         Log.i("LOG", "onCreateView");

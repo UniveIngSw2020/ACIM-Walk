@@ -56,7 +56,6 @@ public class NewmatchFragment extends Fragment {
 
     private NewMatchViewModel newMatchViewModel;
 
-    private TextView userIdTxt;
     private Button startMatchBtn;
 
     private MessageListener idsListener;
@@ -160,7 +159,6 @@ public class NewmatchFragment extends Fragment {
         username = activity != null ? activity.getUsername() : "NaN";
         User currentUser = new User(userEmail, userId, username, 0);
 
-        userIdTxt = root.findViewById(R.id.userID_text);
 
         // Disable start match button. It can be enabled only when user choose the length of the game
         startMatchBtn = root.findViewById(R.id.startNewMatch_btn);
@@ -196,8 +194,6 @@ public class NewmatchFragment extends Fragment {
 
         // sending JSON object to nearby devices
         publish(userInfo.toString());
-        // Show on screen own user ID
-        userIdTxt.setText(userId);
 
         startMatchBtn.setOnClickListener(x -> {
             if (canHost) {

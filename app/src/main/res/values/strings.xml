@@ -26,7 +26,7 @@
     <string name="userID">User ID:</string>
     <string name="startMatch">Walk!</string>
     <string name="logout">Esci</string>
-    <string name="setTime">Durata della partita</string>
+    <string name="setTime">Minuti partita</string>
 
     <!-- strings used for fragment_newmatch -->
     <string name="newmatchStepsCounter">Numero di passsi effettuati:</string>
