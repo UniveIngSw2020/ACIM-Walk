@@ -1,5 +1,6 @@
 package com.acim.walk.ui.matchrecap;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -79,6 +80,11 @@ public class ShowRankingFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
 
+        // displays progress bar while user waits for the device to comunicate w/ Firebase
+        ProgressDialog progress = Util.createProgressBar(getContext(), Util.PROGRESS_DIALOG_TITLE, Util.PROGRESS_DIALOG_MESSAGE);
+        progress.show();
+
+
         /*
          *
          * querying Firebase:
@@ -135,6 +141,9 @@ public class ShowRankingFragment extends Fragment {
                                      * we can now update the recyclerview
                                      */
                                     adapter.notifyDataSetChanged();
+
+                                    // data is ready to be displayed, hiding progress bra
+                                    progress.dismiss();
                                 }
                             }
 

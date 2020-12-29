@@ -61,14 +61,14 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
          */
 
         // getting some data
-        String username = mData.get(position).getEmail();
+        String username = mData.get(position).getUsername();
         int steps = mData.get(position).getSteps();
         int rankingPosition = position+1;
 
         // displaying to the views
         holder.usernameTxt.setText(username);
         holder.stepsTxt.setText(String.valueOf(steps));
-        holder.rankingTxt.setText(String.valueOf(rankingPosition));
+        holder.rankingTxt.setText(String.valueOf(rankingPosition) + '°');
     }
 
 
