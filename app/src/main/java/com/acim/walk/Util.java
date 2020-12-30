@@ -129,4 +129,9 @@ public class Util {
     public static  String ALERT_EMPTY_EMAIL_MESSAGE = "Inserisci prima la tua email";
     public static  String ERROR_SEND_MAIL = "Errore Invio email";
     public static  String ERROR_SEND_MAIL_MESSAGE = "email non inviata correttamente";
+
+    public static  String ALERT_EMPTY_PASSWORD_TITLE = "Campo password vuoto";
+    public static  String ALERT_EMPTY_PASSWORD_MESSAGE = "Inserisci una nuova password";
+    public static  String ERROR_UPDATE_PASSWORD = "Errore aggiornamento password";
+    public static  String ERROR_UPDATE_PASSWORD_MESSAGE = "Aggiornamento non effettuato correttamente";
 }

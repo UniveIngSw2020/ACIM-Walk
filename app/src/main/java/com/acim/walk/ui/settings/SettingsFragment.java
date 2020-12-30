@@ -3,10 +3,12 @@ package com.acim.walk.ui.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
@@ -22,8 +24,11 @@ import com.acim.walk.AuthActivity;
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
+import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -37,6 +42,7 @@ public class SettingsFragment extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private Button logoutBtn;
+    private Button updatePassword;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -139,5 +145,53 @@ public class SettingsFragment extends Fragment {
         });
 
         return root;
+    }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // setting up Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        final EditText new_password = getView().findViewById(R.id.resetPassword);
+        final EditText old_Password = getView().findViewById(R.id.oldPassword);
+
+        view.findViewById(R.id.update_button).setOnClickListener(new View.OnClickListener() {
+
+        //updatePassword = root.findViewById(R.id.update_button);
+        //updatePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                user = mAuth.getCurrentUser();
+                String oldPassword = old_Password.getText().toString().trim();
+                String newPassword = new_password.getText().toString().trim();
+                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
+                if(user != null) {
+                    if (!newPassword.equals("")) {
+                        user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    user.updatePassword(newPassword).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Util.toast(getActivity(), "Password Aggiornata!", true);
+                                            } else {
+                                                Util.showErrorAlert(getContext(), Util.ERROR_UPDATE_PASSWORD, Util.ERROR_UPDATE_PASSWORD_MESSAGE);
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    Util.showErrorAlert(getContext(), Util.ERROR_UPDATE_PASSWORD, Util.ERROR_UPDATE_PASSWORD_MESSAGE);
+                                }
+                            }
+                        });
+                    } else {
+                        Util.showErrorAlert(getContext(), Util.ALERT_EMPTY_PASSWORD_TITLE, Util.ALERT_EMPTY_PASSWORD_MESSAGE);
+                    }
+                }
+            }
+        });
     }
 }

@@ -63,10 +63,12 @@
     <string name="rankingUsername">Username</string>
     <string name="rankingSteps">Passi</string>
 
-    <string name="logout">Esci</string>
-
-
-    <!-- strings used for fragment_signin -->
+    <!-- strings used for fragment_settings -->
+    <string name="logout">Logout</string>
+    <string name="label_update_password">Inserisci la tua nuova password</string>
+    <string name="editText_oldPassword">Vecchia Password</string>
+    <string name="editText_password">New Password</string>
     <string name="update_button">Aggiorna</string>
-    <string name="password_label">Inserisci la tua nuova password</string>
+    <string name="label_title_update_password">Aggiornamento Password</string>
+
 </resources>
