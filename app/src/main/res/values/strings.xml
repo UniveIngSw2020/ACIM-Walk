@@ -2,13 +2,14 @@
     <string name="app_name">Walk!</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_title">Walk!</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
 
     <!-- strings used for fragment_login -->
     <string name="login_button">Accedi</string>
     <string name="login_signup_label">Non hai un account? Registrati</string>
+    <string name="reset_password">Ho dimenticato la password</string>
 
     <!-- strings used for fragment_signin -->
     <string name="signin_button">Registrati</string>
@@ -64,4 +65,8 @@
 
     <string name="logout">Esci</string>
 
+
+    <!-- strings used for fragment_signin -->
+    <string name="update_button">Aggiorna</string>
+    <string name="password_label">Inserisci la tua nuova password</string>
 </resources>

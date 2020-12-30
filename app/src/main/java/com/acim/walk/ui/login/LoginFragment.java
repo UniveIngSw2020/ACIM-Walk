@@ -149,5 +149,32 @@ public class LoginFragment extends Fragment {
                         .navigate(R.id.action_FirstFragment_to_SecondFragment);
             }
         });
+
+        /*
+         * label under the password editText
+         * reset password
+         */
+        view.findViewById(R.id.reset_password_label).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String emailValue = email.getText().toString().trim();
+                if(emailValue != ""){
+                    mAuth.sendPasswordResetEmail(emailValue)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Util.toast(getActivity(), "Email inviata!", true);
+                                    }else{
+                                        Util.showErrorAlert(getContext(), Util.ERROR_SEND_MAIL, Util.ERROR_SEND_MAIL_MESSAGE);
+                                    }
+                                }
+                            });
+                } else {
+                    // email not setted, we show an alert
+                    Util.showErrorAlert(getContext(), Util.ALERT_EMPTY_EMAIL_TITLE, Util.ALERT_EMPTY_EMAIL_MESSAGE);
+                }
+            }
+        });
     }
 }

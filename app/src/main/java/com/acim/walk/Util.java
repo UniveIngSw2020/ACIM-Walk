@@ -124,4 +124,9 @@ public class Util {
 
     public static String PROGRESS_DIALOG_TITLE = "Caricamento";
     public static String PROGRESS_DIALOG_MESSAGE = "Si prega di attendere...";
+
+    public static  String ALERT_EMPTY_EMAIL_TITLE = "Campo email vuoto";
+    public static  String ALERT_EMPTY_EMAIL_MESSAGE = "Inserisci prima la tua email";
+    public static  String ERROR_SEND_MAIL = "Errore Invio email";
+    public static  String ERROR_SEND_MAIL_MESSAGE = "email non inviata correttamente";
 }
