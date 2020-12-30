@@ -7,7 +7,7 @@
     <string name="nav_header_desc">Navigation header</string>
 
     <!-- strings used for fragment_login -->
-    <string name="login_button">Login</string>
+    <string name="login_button">Accedi</string>
     <string name="login_signup_label">Non hai un account? Registrati</string>
 
     <!-- strings used for fragment_signin -->
