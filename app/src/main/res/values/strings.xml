@@ -70,5 +70,6 @@
     <string name="editText_password">New Password</string>
     <string name="update_button">Aggiorna</string>
     <string name="label_title_update_password">Aggiornamento Password</string>
+    <string name="label_forget_old_password">Ho dimenticato la vecchia password</string>
 
 </resources>

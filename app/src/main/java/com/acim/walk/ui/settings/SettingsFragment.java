@@ -100,7 +100,7 @@ public class SettingsFragment extends Fragment {
                 new ViewModelProvider(this).get(SettingsViewModel.class);
 
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
-
+/*
         final TextView textView = root.findViewById(R.id.text_slideshow);
         settingsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
@@ -108,7 +108,7 @@ public class SettingsFragment extends Fragment {
                 textView.setText(s);
             }
 
-        });
+        });*/
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -189,6 +189,32 @@ public class SettingsFragment extends Fragment {
                         });
                     } else {
                         Util.showErrorAlert(getContext(), Util.ALERT_EMPTY_PASSWORD_TITLE, Util.ALERT_EMPTY_PASSWORD_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        view.findViewById(R.id.forget_old_password).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                user = mAuth.getCurrentUser();
+                if(user != null) {
+                    String emailValue = user.getEmail();
+                    if (emailValue != "") {
+                        mAuth.sendPasswordResetEmail(emailValue)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Util.toast(getActivity(), "Email inviata!", true);
+                                        } else {
+                                            Util.showErrorAlert(getContext(), Util.ERROR_SEND_MAIL, Util.ERROR_SEND_MAIL_MESSAGE);
+                                        }
+                                    }
+                                });
+                    } else {
+                        // email not setted, we show an alert
+                        Util.showErrorAlert(getContext(), Util.ERROR_GET_USER, Util.ERROR_GET_USER_MESSAGE);
                     }
                 }
             }

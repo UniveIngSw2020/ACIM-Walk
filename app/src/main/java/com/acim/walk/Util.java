@@ -36,9 +36,6 @@ public class Util {
         return c.getTimeInMillis();
     }
 
-
-
-
     /**
      *
      * Validates form for AuthActivity's LoginFragment and SignInFragment
@@ -55,7 +52,6 @@ public class Util {
         // all strings are NOT empty, form is valid
         return true;
     }
-
 
     /**
      *
@@ -80,7 +76,6 @@ public class Util {
         }).create().show();
     }
 
-
     /**
      *
      * Shows progress bar
@@ -99,7 +94,6 @@ public class Util {
         return progress;
     }
 
-
     /**
      *
      * prints a Toast
@@ -112,8 +106,6 @@ public class Util {
         int TOAST_DURATION = isDurationShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG;
         Toast.makeText(context, message, TOAST_DURATION).show();
     }
-
-
 
 
     // these are the messages that will be shown to display some errors to the users
@@ -130,8 +122,11 @@ public class Util {
     public static  String ERROR_SEND_MAIL = "Errore Invio email";
     public static  String ERROR_SEND_MAIL_MESSAGE = "email non inviata correttamente";
 
+    //fragment settings
     public static  String ALERT_EMPTY_PASSWORD_TITLE = "Campo password vuoto";
     public static  String ALERT_EMPTY_PASSWORD_MESSAGE = "Inserisci una nuova password";
     public static  String ERROR_UPDATE_PASSWORD = "Errore aggiornamento password";
     public static  String ERROR_UPDATE_PASSWORD_MESSAGE = "Aggiornamento non effettuato correttamente";
+    public static  String ERROR_GET_USER = "Errore recupero utente";
+    public static  String ERROR_GET_USER_MESSAGE = "non è stato recuperato correttamente l'utente";
 }
