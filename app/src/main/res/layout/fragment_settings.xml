@@ -8,10 +8,13 @@
 
     <Button
         android:id="@+id/logoutBtn"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
         android:text="@string/logout"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -25,16 +28,18 @@
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/update_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.742" />
+        app:layout_constraintVertical_bias="0.827" />
 
     <Button
         android:id="@+id/update_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="260dp"
+        android:layout_marginTop="280dp"
         android:text="@string/update_button"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,10 +49,10 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="32dp"
         android:text="@string/label_title_update_password"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="27sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,8 +62,7 @@
         android:id="@+id/oldPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="145dp"
+        android:layout_marginTop="32dp"
         android:ems="10"
         android:hint="@string/editText_oldPassword"
         android:inputType="textPassword"
@@ -76,8 +80,10 @@
         android:layout_marginTop="4dp"
         android:text="@string/label_forget_old_password"
         android:textSize="12sp"
+        android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.471"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/oldPassword" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

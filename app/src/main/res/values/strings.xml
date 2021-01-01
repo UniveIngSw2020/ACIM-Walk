@@ -67,9 +67,18 @@
     <string name="logout">Logout</string>
     <string name="label_update_password">Inserisci la tua nuova password</string>
     <string name="editText_oldPassword">Vecchia Password</string>
-    <string name="editText_password">New Password</string>
+    <string name="editText_password">Nuova Password</string>
     <string name="update_button">Aggiorna</string>
     <string name="label_title_update_password">Aggiornamento Password</string>
     <string name="label_forget_old_password">Ho dimenticato la vecchia password</string>
+    <string name="label_logout">Vuoi uscire?</string>
+
+    <!-- strings used for mobile_navigation -->
+    <string name="mob_nav_home">Home</string>
+    <string name="mob_nav_search_opponent">Ricerca partita</string>
+    <string name="mob_nav_newmatch">Crea partita</string>
+    <string name="mob_nav_settings">Impostazioni</string>
+    <string name="mob_nav_matchrecap">Riepilogo partita</string>
+    <string name="mob_nav_ranking">Classifica</string>
 
 </resources>

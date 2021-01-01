@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="com.acim.walk.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" >
+        android:label="@string/mob_nav_home"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_nav_home_to_search_opponent_layout"
             app:destination="@id/search_opponent_layout" />
@@ -24,8 +24,8 @@
     <fragment
         android:id="@+id/nav_matchrecap"
         android:name="com.acim.walk.ui.matchrecap.MatchRecapFragment"
-        android:label="Match recap"
-        tools:layout="@layout/match_recap_fragment" >
+        android:label="@string/mob_nav_matchrecap"
+        tools:layout="@layout/match_recap_fragment">
         <action
             android:id="@+id/action_nav_matchrecap_to_nav_show_ranking"
             app:destination="@id/nav_show_ranking" />
@@ -34,25 +34,24 @@
     <fragment
         android:id="@+id/nav_show_ranking"
         android:name="com.acim.walk.ui.matchrecap.ShowRankingFragment"
-        android:label="Show Ranking"
-        tools:layout="@layout/fragment_show_ranking"
-        />
+        android:label="@string/mob_nav_ranking"
+        tools:layout="@layout/fragment_show_ranking" />
 
     <fragment
         android:id="@+id/search_opponent_layout"
         android:name="com.acim.walk.ui.searchmatch.SearchMatchFragment"
-        android:label="@string/menu_searchmatch"
+        android:label="@string/mob_nav_search_opponent"
         tools:layout="@layout/fragment_searchmatch" />
 
     <fragment
         android:id="@+id/nav_newmatch"
         android:name="com.acim.walk.ui.newmatch.NewmatchFragment"
-        android:label="@string/menu_newmatch"
+        android:label="@string/mob_nav_newmatch"
         tools:layout="@layout/fragment_newmatch" />
 
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.acim.walk.ui.settings.SettingsFragment"
-        android:label="@string/menu_settings"
+        android:label="@string/mob_nav_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>
