@@ -2,6 +2,7 @@ package com.acim.walk.ui.login;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -174,6 +175,33 @@ public class LoginFragment extends Fragment {
                     // email not setted, we show an alert
                     Util.showErrorAlert(getContext(), Util.ALERT_EMPTY_EMAIL_TITLE, Util.ALERT_EMPTY_EMAIL_MESSAGE);
                 }
+            }
+        });
+
+        view.findViewById(R.id.twitter_logo).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("https://twitter.com/Walk02318614");
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+            }
+        });
+
+        view.findViewById(R.id.facebook_logo).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("https://www.facebook.com/walkk.acim/");
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+            }
+        });
+
+        view.findViewById(R.id.instagram_logo).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("https://www.instagram.com/walk_acim/");
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
             }
         });
     }

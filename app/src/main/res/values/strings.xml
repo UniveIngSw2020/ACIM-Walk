@@ -81,4 +81,8 @@
     <string name="mob_nav_matchrecap">Riepilogo partita</string>
     <string name="mob_nav_ranking">Classifica</string>
 
+    <!-- strings for logo -->
+    <string name="facebook_logo">facebook_logo</string>
+    <string name="instagram_logo">instagram_logo</string>
+    <string name="whatsapp_logo">whatsapp_logo</string>
 </resources>
