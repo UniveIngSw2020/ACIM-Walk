@@ -159,7 +159,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String emailValue = email.getText().toString().trim();
-                if(emailValue != ""){
+                if(!emailValue.equals("")){
                     mAuth.sendPasswordResetEmail(emailValue)
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

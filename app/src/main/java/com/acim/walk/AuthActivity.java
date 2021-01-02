@@ -39,8 +39,6 @@ public class AuthActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth2);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         Log.d(TAG, "AuthActivity --- onCreate");
         //Intent myIntent = new Intent(AuthActivity.this, MainActivity.class);
         //AuthActivity.this.startActivity(myIntent);

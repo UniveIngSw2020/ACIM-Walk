@@ -1,6 +1,7 @@
 package com.acim.walk.ui.matchrecap;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
@@ -76,7 +77,7 @@ public class MatchRecapFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState){
 
         super.onCreate(savedInstanceState);
-
+        
         /*
          * Callback used when user press go back button. In this case user can go back to previous page
          * but he can only close application. So when user press go back button a dialog will be opened

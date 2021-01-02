@@ -41,7 +41,7 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
     <!-- strings used for fragment_newmatch -->
-    <string name="newmatch_time_text">Inserisci la lunghezza della partita:</string>
+    <string name="newmatch_time_text">Durata della partita in minuti:</string>
     <string name="newmatch_start">Walk!</string>
 
     <!-- strings used for fragment_searchmatch and fragment_newmatch -->
