@@ -87,7 +87,6 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void onFound(Message message) {
                 Log.d(TAG, new String(message.getContent()));
-                Util.toast(getActivity(), new String(message.getContent()), true);
                 /*
                  *
                  * the JSON string will be something like:
@@ -152,7 +151,7 @@ public class SearchMatchFragment extends Fragment {
         // setting up arguments to pass to listview
         userList.clear();
         for (User user : participants) {
-            userList.add(user.getUsername());
+            userList.add(user.getUsername() + " (tu)");
         }
         // setting up listview
         opponentsList = (ListView) root.findViewById(R.id.opponents_list);

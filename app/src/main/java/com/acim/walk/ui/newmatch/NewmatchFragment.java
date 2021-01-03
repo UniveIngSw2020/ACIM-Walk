@@ -167,7 +167,7 @@ public class NewmatchFragment extends Fragment {
         // setting up arguments to pass to listview
         userList.clear();
         for (User user : participants) {
-            userList.add(user.getUsername());
+            userList.add(user.getUsername() + " (tu)");
         }
         // setting up listview
         opponentsList = (ListView) root.findViewById(R.id.opponents_list);

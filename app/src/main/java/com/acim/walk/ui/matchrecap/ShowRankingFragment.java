@@ -73,6 +73,8 @@ public class ShowRankingFragment extends Fragment {
         MainActivity main = (MainActivity) getActivity();
         userId = main.getUserID();
 
+        User.setCurrentUserId(userId);
+
         // setting up recyclerview
         RecyclerView recyclerView = root.findViewById(R.id.rankingRecyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

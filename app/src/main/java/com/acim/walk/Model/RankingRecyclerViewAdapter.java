@@ -1,11 +1,13 @@
 package com.acim.walk.Model;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 
 import java.util.ArrayList;
@@ -64,6 +66,17 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
         String username = mData.get(position).getUsername();
         int steps = mData.get(position).getSteps();
         int rankingPosition = position+1;
+
+        /*
+         * this method soon or later will have access to all the users.
+         * we need to identify the actual user of this device
+         */
+        String userId = mData.get(position).getUserId();
+        String currentUserId = User.getCurrentUserId();
+
+        // checking if this is the actual user and not other players
+        if(userId.equals(currentUserId))
+            username = username.concat(" (tu)");
 
         // displaying to the views
         holder.usernameTxt.setText(username);

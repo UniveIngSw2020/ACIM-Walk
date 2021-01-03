@@ -11,6 +11,16 @@ public class User {
     private String userId;
     private String username;
     private Integer steps;
+
+    /*
+     * this static field is needed for the 'ShowRankingFragment' (displays ranking for current match).
+     *
+     * since the listview of that fragment is managed by the 'RankingRecyclerViewAdapter' model it needs to know
+     * who the actual user of this device is.
+     *
+     * so the 'RankingRecyclerViewAdapter' will interact w/ this variable to access the current user's id
+     */
+    private static String currentUserId;
     @Nullable
     private String matchId;
 
@@ -65,5 +75,9 @@ public class User {
     public String getMatchId() { return matchId; }
 
     public void setMatchId(String matchId) { this.matchId = matchId; }
+
+    // static methods for the current user
+    public static String getCurrentUserId() { return currentUserId; }
+    public static void setCurrentUserId(String x) { currentUserId = x; }
 
 }
