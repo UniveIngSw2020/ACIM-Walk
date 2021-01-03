@@ -1,7 +1,6 @@
 package com.acim.walk.ui.matchrecap;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;

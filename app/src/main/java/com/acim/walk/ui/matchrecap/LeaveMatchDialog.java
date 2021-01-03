@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,7 +43,7 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
         db = FirebaseFirestore.getInstance();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
 
         return builder.setTitle("Attenzione!")
                 .setMessage("Confermando, abbandonerai la partita e non potrai più partecipare. Sei sicuro?")
@@ -129,5 +130,7 @@ public class LeaveMatchDialog extends AppCompatDialogFragment {
 
                     }
                 }).create();
+
     }
+
 }

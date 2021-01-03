@@ -61,7 +61,7 @@ public class Util {
      * @param errorMessage
      */
     public static void showErrorAlert(Context context, String errorTitle, String errorMessage) {
-        new AlertDialog.Builder(context).setTitle(errorTitle)
+        new AlertDialog.Builder(context, R.style.AlertDialogTheme).setTitle(errorTitle)
                 .setMessage(errorMessage)
                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override

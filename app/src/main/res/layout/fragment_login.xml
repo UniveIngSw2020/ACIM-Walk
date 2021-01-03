@@ -88,24 +88,6 @@
 
 
     <ImageView
-        android:id="@+id/twitter_logo"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginEnd="56dp"
-        android:layout_marginBottom="24dp"
-        android:adjustViewBounds="false"
-        android:contentDescription="Twitter Logo"
-        android:cropToPadding="false"
-        android:scaleType="fitCenter"
-        android:src="@drawable/twitter_logo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_signup_label"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/twitter_logo"
-        tools:srcCompat="@drawable/twitter_logo" />
-
-    <ImageView
         android:id="@+id/instagram_logo"
         android:layout_width="56dp"
         android:layout_height="56dp"
@@ -113,7 +95,6 @@
         android:src="@drawable/instagram_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/twitter_logo"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/facebook_logo" />
 
     <ImageView
@@ -128,6 +109,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_signup_label"
         app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/twitter_logo"
+        android:layout_width="69dp"
+        android:layout_height="66dp"
+        android:layout_marginEnd="56dp"
+        android:src="@drawable/twitter_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_signup_label"
+        app:layout_constraintVertical_bias="0.896" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

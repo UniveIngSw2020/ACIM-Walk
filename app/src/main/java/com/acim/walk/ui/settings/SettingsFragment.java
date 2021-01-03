@@ -162,12 +162,15 @@ public class SettingsFragment extends Fragment {
         //updatePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 user = mAuth.getCurrentUser();
                 String oldPassword = old_Password.getText().toString().trim();
                 String newPassword = new_password.getText().toString().trim();
+                if (!newPassword.equals("")) {
+
                 AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), oldPassword);
                 if(user != null) {
-                    if (!newPassword.equals("")) {
+
                         user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -187,9 +190,10 @@ public class SettingsFragment extends Fragment {
                                 }
                             }
                         });
-                    } else {
-                        Util.showErrorAlert(getContext(), Util.ALERT_EMPTY_PASSWORD_TITLE, Util.ALERT_EMPTY_PASSWORD_MESSAGE);
                     }
+                }
+                else {
+                    Util.showErrorAlert(getContext(), Util.ALERT_EMPTY_PASSWORD_TITLE, Util.ALERT_EMPTY_PASSWORD_MESSAGE);
                 }
             }
         });

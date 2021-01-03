@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
+import com.acim.walk.R;
+
 public class CloseAppDialog extends AppCompatDialogFragment {
 
     private final String TAG = "CloseAPpDialog";
@@ -17,7 +19,7 @@ public class CloseAppDialog extends AppCompatDialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
 
         return builder.setTitle("Vuoi uscire?")
                 .setPositiveButton("Sì", new DialogInterface.OnClickListener() {

@@ -23,5 +23,7 @@
 
     <style name="Theme.Walk.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/black</item>
+    </style>
 </resources>
