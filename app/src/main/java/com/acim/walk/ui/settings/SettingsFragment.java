@@ -27,6 +27,7 @@ import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -109,6 +110,16 @@ public class SettingsFragment extends Fragment {
             }
 
         });*/
+
+
+        MainActivity activity = (MainActivity)getActivity();
+
+        // getting access to the menu
+        NavigationView nav = activity.getNavigation();
+        // hiding some options on this fragment (Home and NewMatch)
+        nav.getMenu().findItem(R.id.nav_settings).setVisible(false);
+        nav.getMenu().findItem(R.id.nav_home).setVisible(true);
+
 
         mAuth = FirebaseAuth.getInstance();
 

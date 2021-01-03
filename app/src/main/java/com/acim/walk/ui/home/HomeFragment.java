@@ -21,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.ui.CloseAppDialog;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -101,6 +102,14 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
         if(username == null)
             text = user.getEmail();
         userInfoTxt.setText(text);*/
+
+
+
+        // hiding 'Home' menu option
+        MainActivity activity = (MainActivity)getActivity();
+        NavigationView nav = activity.getNavigation();
+        nav.getMenu().findItem(R.id.nav_home).setVisible(false);
+        nav.getMenu().findItem(R.id.nav_settings).setVisible(true);
 
 
         searchMatchBtn.setOnClickListener(new View.OnClickListener() {
