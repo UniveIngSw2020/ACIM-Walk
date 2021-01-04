@@ -23,7 +23,6 @@ import com.acim.walk.R;
 import com.acim.walk.ui.CloseAppDialog;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -110,6 +109,12 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
         NavigationView nav = activity.getNavigation();
         nav.getMenu().findItem(R.id.nav_home).setVisible(false);
         nav.getMenu().findItem(R.id.nav_settings).setVisible(true);
+
+        //Set username on HeaderView
+        TextView username;
+        View headerView = nav.getHeaderView(0);
+        username = (TextView) headerView.findViewById(R.id.navUsername);
+        username.setText(activity.getUsername());
 
 
         searchMatchBtn.setOnClickListener(new View.OnClickListener() {
