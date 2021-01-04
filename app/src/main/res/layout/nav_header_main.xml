@@ -21,15 +21,12 @@
         app:srcCompat="@mipmap/walk_logo_foreground" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="402dp"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/nav_header_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nav_header_subtitle" />
 </LinearLayout>
