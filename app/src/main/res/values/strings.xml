@@ -76,6 +76,7 @@
     <string name="button_elimina_account">Elimina</string>
     <string name="label_forget_password">Ho dimenticato la password</string>
 
+
     <!-- strings used for mobile_navigation -->
     <string name="mob_nav_home">Home</string>
     <string name="mob_nav_search_opponent">Ricerca partita</string>

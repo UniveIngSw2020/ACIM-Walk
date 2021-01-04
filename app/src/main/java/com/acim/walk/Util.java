@@ -129,4 +129,8 @@ public class Util {
     public static  String ERROR_UPDATE_PASSWORD_MESSAGE = "Aggiornamento non effettuato correttamente";
     public static  String ERROR_GET_USER = "Errore recupero utente";
     public static  String ERROR_GET_USER_MESSAGE = "non è stato recuperato correttamente l'utente";
+    public static  String ERROR_DELETE_USER = "Errore eliminazione account";
+    public static  String ERROR_DELETE_USER_MESSAGE = "Eliminazione Account non avvenuta correttamente";
+    public static  String ALERT_EMPTY_PASSWORD_ELIMINA_MESSAGE = "Inserisci prima la tua password";
+
 }

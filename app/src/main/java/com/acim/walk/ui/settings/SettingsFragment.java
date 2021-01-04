@@ -25,6 +25,7 @@ import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
+import com.acim.walk.ui.login.LoginFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -191,6 +192,7 @@ public class SettingsFragment extends Fragment {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
                                                 Util.toast(getActivity(), "Password Aggiornata!", true);
+
                                             } else {
                                                 Util.showErrorAlert(getContext(), Util.ERROR_UPDATE_PASSWORD, Util.ERROR_UPDATE_PASSWORD_MESSAGE);
                                             }
@@ -234,6 +236,50 @@ public class SettingsFragment extends Fragment {
                 }
             }
         });
+
+        final EditText passwordElimina = getView().findViewById(R.id.password_elimina);
+
+        view.findViewById(R.id.btn_delete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                user = mAuth.getCurrentUser();
+                String password = passwordElimina.getText().toString().trim();
+                if (!password.equals("")) {
+
+                    AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+                    if(user != null) {
+
+                        user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Intent pageIniziale = new Intent(getActivity(), AuthActivity.class);
+                                                pageIniziale.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                                                getActivity().startActivity(pageIniziale);
+                                                Util.toast(getActivity(), "Account Eliminato!", true);
+                                            } else {
+                                                Util.showErrorAlert(getContext(), Util.ERROR_DELETE_USER, Util.ERROR_DELETE_USER_MESSAGE);
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    Util.showErrorAlert(getContext(), Util.ERROR_DELETE_USER, Util.ERROR_DELETE_USER_MESSAGE);
+                                }
+                            }
+                        });
+                    }
+                }
+                else {
+                    Util.showErrorAlert(getContext(), Util.ALERT_EMPTY_PASSWORD_TITLE, Util.ALERT_EMPTY_PASSWORD_ELIMINA_MESSAGE);
+                }
+            }
+        });
+
 
         view.findViewById(R.id.lbl_forget_password).setOnClickListener(new View.OnClickListener() {
             @Override
