@@ -3,19 +3,16 @@ package com.acim.walk.ui.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -25,7 +22,6 @@ import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.SensorListener;
 import com.acim.walk.Util;
-import com.acim.walk.ui.login.LoginFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -159,6 +155,7 @@ public class SettingsFragment extends Fragment {
         return root;
     }
 
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -168,10 +165,11 @@ public class SettingsFragment extends Fragment {
         final EditText new_password = getView().findViewById(R.id.resetPassword);
         final EditText old_Password = getView().findViewById(R.id.oldPassword);
 
+        /*
+         * Button for Update Password
+         */
         view.findViewById(R.id.update_button).setOnClickListener(new View.OnClickListener() {
 
-        //updatePassword = root.findViewById(R.id.update_button);
-        //updatePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -211,34 +209,21 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        /*
+         * label for reset the Password if the user forget it
+         */
         view.findViewById(R.id.forget_old_password).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                user = mAuth.getCurrentUser();
-                if(user != null) {
-                    String emailValue = user.getEmail();
-                    if (emailValue != "") {
-                        mAuth.sendPasswordResetEmail(emailValue)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Util.toast(getActivity(), "Email inviata!", true);
-                                        } else {
-                                            Util.showErrorAlert(getContext(), Util.ERROR_SEND_MAIL, Util.ERROR_SEND_MAIL_MESSAGE);
-                                        }
-                                    }
-                                });
-                    } else {
-                        // email not setted, we show an alert
-                        Util.showErrorAlert(getContext(), Util.ERROR_GET_USER, Util.ERROR_GET_USER_MESSAGE);
-                    }
-                }
+                resetPassword("Email inviata!", Util.ERROR_SEND_MAIL, Util.ERROR_SEND_MAIL_MESSAGE, Util.ERROR_GET_USER, Util.ERROR_GET_USER_MESSAGE );
             }
         });
 
         final EditText passwordElimina = getView().findViewById(R.id.password_elimina);
 
+        /*
+         * Button for Update Password
+         */
         view.findViewById(R.id.btn_delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -280,31 +265,40 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-
+        /*
+         * label for reset the Password if the user forget it
+         */
         view.findViewById(R.id.lbl_forget_password).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                user = mAuth.getCurrentUser();
-                if(user != null) {
-                    String emailValue = user.getEmail();
-                    if (emailValue != "") {
-                        mAuth.sendPasswordResetEmail(emailValue)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Util.toast(getActivity(), "Email inviata!", true);
-                                        } else {
-                                            Util.showErrorAlert(getContext(), Util.ERROR_SEND_MAIL, Util.ERROR_SEND_MAIL_MESSAGE);
-                                        }
-                                    }
-                                });
-                    } else {
-                        // email not setted, we show an alert
-                        Util.showErrorAlert(getContext(), Util.ERROR_GET_USER, Util.ERROR_GET_USER_MESSAGE);
-                    }
-                }
+                resetPassword("Email inviata!", Util.ERROR_SEND_MAIL, Util.ERROR_SEND_MAIL_MESSAGE, Util.ERROR_GET_USER, Util.ERROR_GET_USER_MESSAGE );
             }
         });
+    }
+
+    /*
+    *  Method for reset Password - usage: OnClick method of two label in the fragment
+    */
+    public void resetPassword(String message, String errorTitle, String errorMessage, String errorGetUser, String errorGetUserMesasge){
+        user = mAuth.getCurrentUser();
+        if(user != null) {
+            String emailValue = user.getEmail();
+            if (emailValue != "") {
+                mAuth.sendPasswordResetEmail(emailValue)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Util.toast(getActivity(), message, true);
+                                } else {
+                                    Util.showErrorAlert(getContext(), errorTitle, errorMessage);
+                                }
+                            }
+                        });
+            } else {
+                // email not setted, we show an alert
+                Util.showErrorAlert(getContext(), errorGetUser, errorGetUserMesasge);
+            }
+        }
     }
 }
