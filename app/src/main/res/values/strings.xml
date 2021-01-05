@@ -23,11 +23,9 @@
     <!-- strings used for fragment_home -->
     <string name="menu_home">Home</string>
     <string name="home_welcome">Benvenuto in Walk!</string>
-    <string name="home_summary">Sfida chiunque per dimostare chi è il maratoneta migliore.
-    Potrai scegliere se partecipare ad una partita, oppure se vuoi potrai crearne tu una, scegliendo la durata
-    della partita.</string>
-    <string name="menu_newmatch">Crea una partita</string>
-    <string name="menu_searchmatch">Cerca una partita</string>
+    <string name="home_summary">Vincere è semplice: cammina più degli altri!<br></br>Toccando "Crea partita" potrai essere tu a scegliere la durata. Toccando "Cerca partita" potrai partecipare alle sfide nelle vicinanze.</string>
+    <string name="menu_newmatch">Crea partita</string>
+    <string name="menu_searchmatch">Cerca partita</string>
     <string name="menu_settings">Impostazioni</string>
     <string name="title_activity_auth">Walk!</string>
 
