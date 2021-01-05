@@ -8,15 +8,16 @@ import androidx.lifecycle.ViewModel;
 
 public class HomeViewModel extends ViewModel {
 
-    private MutableLiveData<String> mText;
+    /*
+    * HomeViewModel fields.
+    * */
 
+    /*
+    * Public constructor
+    * */
+    public HomeViewModel() {}
 
-    public HomeViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("Fragment Homeeeeeeeee :D");
-    }
-
-    public LiveData<String> getText() {
-        return mText;
-    }
+    /*
+    * Public methods
+    * */
 }

@@ -74,9 +74,7 @@ public class MatchRecapFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState){
-
         super.onCreate(savedInstanceState);
-        
         /*
          * Callback used when user press go back button. In this case user can go back to previous page
          * but he can only close application. So when user press go back button a dialog will be opened
