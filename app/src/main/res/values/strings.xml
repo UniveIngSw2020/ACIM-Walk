@@ -73,6 +73,10 @@
     <string name="label_elimina_account">Eliminazione Account</string>
     <string name="button_elimina_account">Elimina</string>
     <string name="label_forget_password">Ho dimenticato la password</string>
+    <string name="label_title_user_info">Informazioni Utente</string>
+    <string name="label_email">email</string>
+    <string name="label_userame">Username</string>
+
 
 
     <!-- strings used for mobile_navigation -->

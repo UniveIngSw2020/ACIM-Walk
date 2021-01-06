@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -108,8 +109,15 @@ public class SettingsFragment extends Fragment {
 
         });*/
 
-
         MainActivity activity = (MainActivity)getActivity();
+
+        /*
+        * set user info - email and username
+        */
+        TextView email = (TextView) root.findViewById(R.id.email_user_info);
+        email.setText(activity.getUserEmail());
+        TextView username = (TextView) root.findViewById(R.id.username_user_info);
+        username.setText(activity.getUsername());
 
         // getting access to the menu
         NavigationView nav = activity.getNavigation();
