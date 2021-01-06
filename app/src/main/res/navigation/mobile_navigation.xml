@@ -54,4 +54,10 @@
         android:name="com.acim.walk.ui.settings.SettingsFragment"
         android:label="@string/mob_nav_settings"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/nav_faq"
+        android:name="com.acim.walk.ui.faq.FaqFragment"
+        android:label="FAQ"
+        tools:layout="@layout/fragment_faq" />
 </navigation>
