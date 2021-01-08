@@ -70,21 +70,21 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // startService(new Intent(this, SensorListener.class));
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
+            //user information coming from AuthActivity
             userID = extras.getString("userID");
             userEmail = extras.getString("userEmail");
             username = extras.getString("username");
         } else {
-            // Activity created from tap on notification
+            //Activity created from tap on notification
             userID = mAuth.getUid();
             userEmail = mAuth.getCurrentUser().getEmail();
             username = mAuth.getCurrentUser().getDisplayName();
             username = mAuth.getCurrentUser().getDisplayName();
         }
 
+        //check if service is stopped and if it needs to be resumed
         if(isServiceStopped) {
             SharedPreferences prefs = getApplicationContext().getSharedPreferences("pedometer", Context.MODE_PRIVATE);
             if (!prefs.getBoolean("matchFinished", true)) {
@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity{
             }
         }
 
+        //setting up the layout
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -110,7 +111,6 @@ public class MainActivity extends AppCompatActivity{
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-
         /*
          * checking if user has an actual match going on.
          * first we get the user's data from Firebase.
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity{
          * if there's NO match going on, show regular HomeFragment
          */
 
-        // displays progress bar while user waits for the device to comunicate w/ Firebase
+        // displays progress bar while user waits for the device to communicate with Firebase
         ProgressDialog progress = Util.createProgressBar(this, Util.PROGRESS_DIALOG_TITLE, Util.PROGRESS_DIALOG_MESSAGE);
         progress.show();
 
@@ -175,6 +175,10 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
+    /**
+     * To manage back button tap on navigation bar
+     * @return
+     */
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);

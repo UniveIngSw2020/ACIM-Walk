@@ -47,6 +47,7 @@ public class SearchMatchFragment extends Fragment {
 
     private final String TAG = "SearchMatchFragment";
 
+    //constants with JSON object fields names
     private final String JSON_ID = "userId";
     private final String JSON_EMAIL = "userEmail";
     private final String JSON_USERNAME = "username";
@@ -54,25 +55,27 @@ public class SearchMatchFragment extends Fragment {
 
     private SearchMatchViewModel searchMatchViewModel;
 
-    private MessageListener idsListener;
-    private Message userIdMessage;
+    private MessageListener idsListener; //Message listener object for Nearby Messages
+    private Message userIdMessage; //Nearby message object
 
     // An ExecutorService that can schedule commands to run after a given delay, or to execute periodically
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    // listview reference
+    //listview reference
     private ListView opponentsList;
+    //list containing usernames of found users
     ArrayList<String> userList = new ArrayList<>();
     // list view data source
     private ArrayAdapter<String> adapter;
 
-    private HashSet<User> participants = new HashSet<>();
+    private HashSet<User> participants = new HashSet<>(); //set containing User object of nearby users
 
+    //current user information fields
     private String userId = null;
     private String username = null;
     private String userEmail = null;
 
-
+    //option for Nearby Messages listener
     private final SubscribeOptions options = new SubscribeOptions.Builder()
             .setStrategy(Strategy.DEFAULT)
             .build();
@@ -90,7 +93,7 @@ public class SearchMatchFragment extends Fragment {
                 /*
                  *
                  * the JSON string will be something like:
-                 * {"userId":"TuUU5TvJC6MgcBuagjYkNFIAOk82","userEmail":"mr@mail.com"}
+                 * {"userId":"TuUU5TvJC6MgcBuagjYkNFIAOk82","userEmail":"mr@mail.com",...}
                  * so here we convert the string to a JSON object
                  *
                  * */
@@ -106,6 +109,7 @@ public class SearchMatchFragment extends Fragment {
                     String receivedUsername = receivedObject.getString(JSON_USERNAME);
                     User receivedUser = new User(receivedEmail, receivedId, receivedUsername);
 
+                    //check if the received user has already been received. If yes do not add him
                     Boolean toAdd = true;
                     for (User user : participants) {
                         if (user.getUserId().equals(receivedId)) {
@@ -115,7 +119,7 @@ public class SearchMatchFragment extends Fragment {
                     if (toAdd) {
                         participants.add(receivedUser);
                         userList.add(receivedUsername);
-                        adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetChanged(); //updates the listview
                     }
 
                 } catch (JSONException e) {
@@ -125,7 +129,7 @@ public class SearchMatchFragment extends Fragment {
 
             @Override
             public void onLost(Message message) {
-                System.out.println("ERROR: " + new String(message.getContent()));
+               Log.d(TAG, "ERROR: " + new String(message.getContent()));
             }
         };
         subscribe();
@@ -139,16 +143,16 @@ public class SearchMatchFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_searchmatch, container, false);
 
-        // Get user infos from MainActivity function and create a new User object
+        // Get user info from MainActivity function and create a new User object
         MainActivity activity = (MainActivity) getActivity();
         userId = activity != null ? activity.getUserID() : "NaN";
         userEmail = activity != null ? activity.getUserEmail() : "NaN";
         username = activity != null ? activity.getUsername() : "NaN";
         User currentUser = new User(userEmail, userId, username, 0);
 
-        participants.add(currentUser);
+        participants.add(currentUser); //current user participates the match if it will be started
 
-        // setting up arguments to pass to listview
+        //setting up arguments to pass to listview
         userList.clear();
         for (User user : participants) {
             userList.add(user.getUsername() + " (tu)");
@@ -156,13 +160,13 @@ public class SearchMatchFragment extends Fragment {
         // setting up listview
         opponentsList = (ListView) root.findViewById(R.id.opponents_list);
         userList.remove(null);
-        // setting up listview adapter
+        //setting up listview adapter
         adapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, userList);
-        // appending data source to listview
+        //appending data source to listview
         opponentsList.setAdapter(adapter);
 
-        // this JSON object will store all user's info and it will be sent to other players using nearby
+        //this JSON object will store all user's info and it will be sent to other players using nearby
         JSONObject userInfo = new JSONObject();
         try {
             userInfo.put(JSON_ID, userId);
@@ -173,25 +177,22 @@ public class SearchMatchFragment extends Fragment {
             e.printStackTrace();
         }
 
-        // sending JSON object to nearby devices
+        //sending JSON object to nearby devices
         publish(userInfo.toString());
 
+        //task which periodically verifies if user who is searching for a match ha join to one. This
+        //is because Nearby Messages are not very reliable
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 if(searchMatchViewModel.checkForMatchParticipation(userId)) {
-/*                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                            .putInt("savedSteps", 0).apply();*/
+
+                    //match has started, so sets up counters, starts the service and navigates to
+                    //the recap fragment
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", false).apply();
 
-
-/*                    int temp = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps",0);
-
-                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                            .putInt("matchStartedAtSteps", temp).apply();*/
                     getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                             .putInt("savedSteps", 0).apply();
-
 
                     getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
 
@@ -219,7 +220,10 @@ public class SearchMatchFragment extends Fragment {
             @Override
             public void run() {
                 if (searchMatchViewModel.checkForMatchParticipation(userId)) {
-                    getActivity().startService(new Intent(getActivity(), SensorListener.class));
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", false).apply();
+                    getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
+                            .putInt("savedSteps", 0).apply();
+                    getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
                     scheduler.shutdown();
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -240,10 +244,14 @@ public class SearchMatchFragment extends Fragment {
         // Close the methods publish and subscribe, so close Nearby function
         unpublish();
         unsubscribe();
-        scheduler.shutdown();
+        scheduler.shutdown(); //stops checking if user has join a game
         super.onStop();
     }
 
+    /**
+     * Used to publish a Nearby message
+     * @param message Nearby message (containing the true message)
+     */
     public void publish(String message) {
         Log.i(TAG, "Publishing: " + message);
 
@@ -251,7 +259,9 @@ public class SearchMatchFragment extends Fragment {
         Nearby.getMessagesClient(getActivity()).publish(userIdMessage);
     }
 
-    // Only use if someone wants to unpublish a message from the chatroom
+    /**
+     * Used to stop sending Nearby messages
+     */
     public void unpublish() {
         Log.i(TAG, "Unpublishing...");
         if (userIdMessage != null) {
@@ -260,7 +270,9 @@ public class SearchMatchFragment extends Fragment {
         }
     }
 
-
+    /**
+     * By calling this method user is able to receive Nearby messages
+     */
     private void subscribe() {
         Log.i(TAG, "Subscribing...");
 
@@ -274,6 +286,9 @@ public class SearchMatchFragment extends Fragment {
 
     }
 
+    /**
+     * By calling this method user won't be able to get Nearby messages
+     */
     private void unsubscribe() {
         Log.i(TAG, "Unsubscribing...");
         Nearby.getMessagesClient(getActivity()).unsubscribe(idsListener);

@@ -45,6 +45,7 @@ public class NewmatchFragment extends Fragment {
 
     private final String TAG = "NewMatchFragment";
 
+    //constants with JSON object fields names
     private final String JSON_USER_ID = "userId";
     private final String JSON_EMAIL = "userEmail";
     private final String JSON_USERNAME = "username";
@@ -53,26 +54,30 @@ public class NewmatchFragment extends Fragment {
 
     private NewMatchViewModel newMatchViewModel;
 
+    //reference to the start button (Walk!)
     private Button startMatchBtn;
 
-    private MessageListener idsListener;
-    private Message matchMessage;
+    private MessageListener idsListener; //Message listener object for Nearby Messages
+    private Message matchMessage; //Nearby message object
 
     // listview reference
     private ListView opponentsList;
+    //list containing usernames of found users
     ArrayList<String> userList = new ArrayList<>();
     // list view data source
     private ArrayAdapter<String> adapter;
 
-    private HashSet<User> participants = new HashSet<>();
+    private HashSet<User> participants = new HashSet<>(); //set containing User object of nearby users
     private HashMap<String, Boolean> participantsConfirmation = new HashMap<>();
 
+    //current user information fields
     private String userId = null;
     private String username = null;
     private String userEmail = null;
+    //to avoid conflicts between users creating the same match simultaneously
     private Boolean canHost = true;
-    private Boolean acceptResponses = false;
 
+    //option for Nearby Messages listener
     private final SubscribeOptions options = new SubscribeOptions.Builder()
             .setStrategy(Strategy.DEFAULT)
             .build();
@@ -89,7 +94,7 @@ public class NewmatchFragment extends Fragment {
                 /*
                  *
                  * the JSON string will be something like:
-                 * {"userId":"TuUU5TvJC6MgcBuagjYkNFIAOk82","userEmail":"mr@mail.com"}
+                 * {"userId":"TuUU5TvJC6MgcBuagjYkNFIAOk82","userEmail":"mr@mail.com",...}
                  * so here we convert the string to a JSON object
                  *
                  * */
@@ -106,7 +111,8 @@ public class NewmatchFragment extends Fragment {
                     Boolean isHost = receivedObject.getBoolean(JSON_IS_HOST);
                     User receivedUser = new User(receivedEmail, receivedId, receivedUsername);
 
-                    // Check if current user has to be added in the game
+                    //check if current user has to be added in the game
+                    //if he is host then do not add him. Mess otherwise
                     if(!isHost) {
                         Boolean toAdd = true;
                         for (User user : participants) {
@@ -117,7 +123,7 @@ public class NewmatchFragment extends Fragment {
                         if (toAdd) {
                             participants.add(receivedUser);
                             userList.add(receivedUsername);
-                            adapter.notifyDataSetChanged();
+                            adapter.notifyDataSetChanged(); //updates the listview
                         }
                     }
 
@@ -127,7 +133,7 @@ public class NewmatchFragment extends Fragment {
                         String receivedId = receivedObject.getString(JSON_USER_ID);
                         participantsConfirmation.put(receivedId, true);
                     } catch (JSONException ex) {
-                        // the received message contains the new match id
+                        //the received message contains the new match id
                         canHost = false;
                     }
                 }
@@ -135,7 +141,7 @@ public class NewmatchFragment extends Fragment {
 
             @Override
             public void onLost(Message message) {
-                System.out.println("ERROR: " + new String(message.getContent()));
+                Log.d(TAG, "ERROR: " + new String(message.getContent()));
             }
         };
         subscribe();
@@ -161,7 +167,7 @@ public class NewmatchFragment extends Fragment {
         startMatchBtn = root.findViewById(R.id.newmatch_start_button);
         startMatchBtn.setEnabled(false);
 
-        // Add it self to the list of participants
+        // Add itself to the list of participants
         participants.add(currentUser);
 
         // setting up arguments to pass to listview
@@ -208,21 +214,17 @@ public class NewmatchFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                unpublish();
-                publish(matchInfo.toString());
+                unpublish(); //stop publishing user info
+                publish(matchInfo.toString()); //publish match id instead
 
+                //match has started so set up counters
                 getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit().putBoolean("matchFinished", false).apply();
-/*                int temp = getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).getInt("savedSteps",0);
-
-                getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
-                        .putInt("matchStartedAtSteps", temp).apply();*/
 
                 getActivity().getSharedPreferences("pedometer", Context.MODE_PRIVATE).edit()
                         .putInt("savedSteps", 0).apply();
 
                 // start the service to count steps
                 getActivity().startForegroundService(new Intent(getActivity(), SensorListener.class));
-
 
                 // go to match recap page
                 NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
@@ -237,11 +239,14 @@ public class NewmatchFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Method used to check if user has insert a duration for his game. If he has insert a duration,
+     * enable the button to start match
+     */
     @Override
     public void onStart() {
         super.onStart();
 
-        // Method used to check if user has insert a duration for his game. If he has insert a duration, enable the button to start match
         EditText gameTime = getActivity().findViewById(R.id.gameDuration_time);
         gameTime.addTextChangedListener(new TextWatcher() {
             @Override
@@ -273,7 +278,10 @@ public class NewmatchFragment extends Fragment {
         super.onStop();
     }
 
-
+    /**
+     * Used to publish a Nearby message
+     * @param message Nearby message (containing the true message)
+     */
     public void publish(String message) {
         Log.i(TAG, "Publishing: " + message);
 
@@ -282,7 +290,9 @@ public class NewmatchFragment extends Fragment {
 
     }
 
-    // Only use if someone wants to unpublish a message from the chatroom
+    /**
+     * Used to stop sending Nearby messages
+     */
     public void unpublish() {
         Log.i(TAG, "Unpublishing...");
         if (matchMessage != null) {
@@ -291,6 +301,9 @@ public class NewmatchFragment extends Fragment {
         }
     }
 
+    /**
+     * By calling this method user is able to receive Nearby messages
+     */
     private void subscribe() {
         Log.i(TAG, "Subscribing...");
 
@@ -304,17 +317,12 @@ public class NewmatchFragment extends Fragment {
 
     }
 
+    /**
+     * By calling this method user won't be able to get Nearby messages
+     */
     private void unsubscribe() {
         Log.i(TAG, "Unsubscribing...");
         Nearby.getMessagesClient(getActivity()).unsubscribe(idsListener);
     }
 
-    private Boolean checkResponses() {
-        for (Boolean b : participantsConfirmation.values()) {
-            if (!b) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

@@ -13,8 +13,14 @@ import com.acim.walk.R;
 
 public class CloseAppDialog extends AppCompatDialogFragment {
 
-    private final String TAG = "CloseAPpDialog";
+    //private final String TAG = "CloseAppDialog";
 
+    /**
+     * Generates a dialog to ask users for exit confirmation. If user confirms, activity will
+     * be finished
+     * @param savedInstanceState
+     * @return
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

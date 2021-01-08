@@ -33,56 +33,52 @@ public class NewMatchViewModel extends ViewModel {
     private final String TAG = "NewMatchViewModel";
 
     private FirebaseFirestore db;
-    private MutableLiveData<String> mText;
-
 
     public NewMatchViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("Ricerca avversario :)");
-
         db = FirebaseFirestore.getInstance();
     }
 
-    public LiveData<String> getText() {
-        return mText;
-    }
-
+    /**
+     * Method used by the host of a match to effectively start a new match
+     * @param participants Collection of User objects which are the participants of the game
+     * @param endDate end moment of the match
+     * @return String containing the created match id
+     */
     public String createMatch(Collection<User> participants, Date endDate) {
 
-        // Retrieves starting moment of the match
+        //Retrieves starting moment of the match
         Date startDate = Calendar.getInstance().getTime();
-        // Converts input collection to List (collection is not serializable)
+        //Converts input collection to List (collection is not serializable)
         List<User> usersList = new ArrayList<>(participants);
 
-        // Gets a new write batch
+        //Gets a new write batch
         WriteBatch batch = db.batch();
 
-        // Creates a new match document assigning to it a random id
+        //Creates a new match document assigning to it a random id
         DocumentReference newMatchRef = db.collection("matches").document();
 
+        //Map containing match participants
         HashMap<String, User> participantsMap = new HashMap<>();
         for(User user : participants){
             participantsMap.put(user.getUserId(), user);
         }
 
+        //Map containing match details
         HashMap<String, Object> matchDetails = new HashMap<>();
         matchDetails.put("endDate", endDate);
-        // matchDetails.put("isOver", false); At the moment, it is useless
         matchDetails.put("matchId", newMatchRef.getId());
         matchDetails.put("startDate", startDate);
 
+        //generates the match document
         batch.set(newMatchRef, matchDetails);
+        //adds to the previously created match document a collection of users
         CollectionReference participantsCollection = newMatchRef.collection("participants");
 
-        //rimuovere questo documento e creare un documento per ogni elemento della mappa participantsMap
-        //DocumentReference participantsReference = participantsCollection.document("participants");
         for (Map.Entry<String, User> entry : participantsMap.entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
+            //Adds each participant to the collection of user of the created match
             DocumentReference newParticipantRef = participantsCollection.document(entry.getKey());
             batch.set(newParticipantRef, entry.getValue());
         }
-
-        //batch.set(participantsReference, participantsMap);
 
         // In the same "transaction" updates the current match reference to users
         for(User user : participants){
@@ -101,7 +97,11 @@ public class NewMatchViewModel extends ViewModel {
         return newMatchRef.getId();
     }
 
-    // Function that retrieve the timestamp when the game will end
+    /**
+     * Function that retrieve the timestamp when the game will end
+     * @param gameTime
+     * @return
+     */
     public Date getEndDate(EditText gameTime) {
         Date currentDate = Calendar.getInstance().getTime();
         long timer = currentDate.getTime();
@@ -113,7 +113,11 @@ public class NewMatchViewModel extends ViewModel {
         return currentDate;
     }
 
-    // Function that set the correct string that contains the timer in milliseconds
+    /**
+     * Function that set the correct string that contains the timer in milliseconds
+     * @param gameTime
+     * @return
+     */
     public int gameTimeInMilliseconds(EditText gameTime) {
         String time = String.valueOf(gameTime.getText());
         int timeInMillis = 0;

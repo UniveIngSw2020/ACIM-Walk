@@ -43,8 +43,6 @@ public class MatchRecapFragment extends Fragment {
 
     private final String TAG = "MatchRecapFragment";
 
-    private MatchRecapViewModel mViewModel;
-
     private Button showRanking;
     private Button leaveMatch;
     private TextView timer_txt;
@@ -109,8 +107,6 @@ public class MatchRecapFragment extends Fragment {
         // hiding some options on this fragment (Home and NewMatch)
         nav.getMenu().findItem(R.id.nav_home).setVisible(false);
         nav.getMenu().findItem(R.id.nav_newmatch).setVisible(false);
-
-        mViewModel = new ViewModelProvider(this).get(MatchRecapViewModel.class);
 
         // Set global variables
         steps_txt = root.findViewById(R.id.matchrecap_steps_text);

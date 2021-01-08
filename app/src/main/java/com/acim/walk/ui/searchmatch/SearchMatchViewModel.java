@@ -38,21 +38,19 @@ public class SearchMatchViewModel extends ViewModel {
     private final String TAG = "SearchMatchViewModel";
 
     private FirebaseFirestore db;
-    private MutableLiveData<String> mText;
+
     private Boolean hasMatch = false;
 
-
     public SearchMatchViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("Ricerca avversario :)");
-
         db = FirebaseFirestore.getInstance();
     }
 
-    public LiveData<String> getText() {
-        return mText;
-    }
-
+    /**
+     * Check if matchId field in user document in the db has a value. If yes that means user has
+     * joined a match, otherwise host hasn't started the match yet
+     * @param userId
+     * @return return true if user participates a match
+     */
     public Boolean checkForMatchParticipation(String userId){
         DocumentReference userRef = db.collection("users").document(userId);
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -78,10 +76,4 @@ public class SearchMatchViewModel extends ViewModel {
         return hasMatch;
     }
 
-    public void setHasMatch(Boolean value){
-        this.hasMatch = value;
-    }
-    public Boolean getHasMatch(){
-        return hasMatch;
-    }
 }

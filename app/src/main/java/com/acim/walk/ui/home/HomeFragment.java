@@ -25,7 +25,6 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
     *
     * */
     private final String TAG = "HomeFragment";
-    private HomeViewModel homeViewModel;
     private Button newMatchBtn, searchMatchBtn;
 
     @Override
@@ -61,7 +60,6 @@ public class HomeFragment extends Fragment /*implements SensorEventListener2*/ {
         * */
 
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         newMatchBtn = root.findViewById(R.id.home_createMatch_button);
         searchMatchBtn = root.findViewById(R.id.home_searchMatch_button);
 
