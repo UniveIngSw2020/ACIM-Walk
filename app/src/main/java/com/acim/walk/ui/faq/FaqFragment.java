@@ -9,8 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.acim.walk.MainActivity;
 import com.acim.walk.R;
 import com.acim.walk.Util;
+import com.google.android.material.navigation.NavigationView;
 
 public class FaqFragment extends Fragment {
 
@@ -22,6 +24,7 @@ public class FaqFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_faq, container, false);
 
+        //open AlertDialog on click to see the answer
         root.findViewById(R.id.first_question).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -37,7 +40,7 @@ public class FaqFragment extends Fragment {
         root.findViewById(R.id.third_question).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Util.showErrorAlert(getContext(), "Eliminazione Account", Util.THIRD_ANSWER);
+                Util.showErrorAlert(getContext(), "Aggiornamento Password", Util.THIRD_ANSWER);
             }
         });
         root.findViewById(R.id.fouth_question).setOnClickListener(new View.OnClickListener() {
@@ -47,16 +50,12 @@ public class FaqFragment extends Fragment {
             }
         });
 
+        //set visible
+        MainActivity activity = (MainActivity)getActivity();
+        NavigationView nav = activity.getNavigation();
+        nav.getMenu().findItem(R.id.nav_home).setVisible(true);
+        nav.getMenu().findItem(R.id.nav_settings).setVisible(true);
+
         return root;
     }
-/*
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-
-
-    }*/
-
-
 }
