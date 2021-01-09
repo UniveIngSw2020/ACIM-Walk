@@ -87,8 +87,16 @@
     <string name="mob_nav_matchrecap">Riepilogo partita</string>
     <string name="mob_nav_ranking">Classifica</string>
 
-    <!-- strings for logo -->
+    <!-- strings for social logo -->
     <string name="facebook_logo">facebook logo</string>
     <string name="instagram_logo">instagram logo</string>
     <string name="twitter_logo">twitter logo</string>
+
+    <!-- strings for FAQ fragment -->
+    <string name="title_faq">FAQ</string>
+    <string name="first_question">1. Come Giocare?</string>
+    <string name="second_question">2. Come faccio se dimentico la password e non riesco ad accedere?</string>
+    <string name="third_question">3. Come aggiorno la mia password?</string>
+    <string name="fourth_question">4. Come elimino il mio account?</string>
+
 </resources>

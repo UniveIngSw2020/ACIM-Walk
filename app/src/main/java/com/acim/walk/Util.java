@@ -107,4 +107,16 @@ public class Util {
     public static  String ERROR_DELETE_USER_MESSAGE = "Eliminazione Account non avvenuta correttamente";
     public static  String ALERT_EMPTY_PASSWORD_ELIMINA_MESSAGE = "Inserisci prima la tua password";
 
+    //fragment FAQ
+    public static  String FIRST_ANSWER = " Una volta fatto il login, è possibile o ricercare una partita nelle" +
+            " vicinanze premendo il bottone \"CERCA PARTITE\" o crearne una propria premendo il bottone \"CREA PARTITA\" " +
+            " inserendo il nome della partita e la durata e rimanere in attesa che altri giocatori" +
+            " si uniscano alla tua partita";
+    public static  String SECOND_ANSWER = "Sulla schermata del Login sotto all inserimento della password e cliccare su Ho dimenticato" +
+            " la Password, verrà così inviata una mail sulla propria casella postale" +
+            " contenente un link per il reset della password";
+    public static String THIRD_ANSWER = "Nella schermata IMPOSTAZIONI, cliccando su AGGIORNA dopo aver inserito la vecchia e la nuova password";
+
+    public static  String FOURTH_ANSWER = "Nella schermata IMPOSTAZIONI in basso c'è il bottone per l'eliminazione dell'account, sarà prima necesario inserire la password corrente";
+
 }
