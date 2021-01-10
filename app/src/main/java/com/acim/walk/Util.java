@@ -83,41 +83,46 @@ public class Util {
 
 
     // these are the messages that will be shown to display some errors to the users
-    public static String ERROR_DIALOG_TITLE = "Errore Autenticazione";
-    public static String ERROR_DIALOG_MESSAGE_VALIDATION = "Compilare tutti i campi";
-    public static String ERROR_DIALOG_MESSAGE_FAILED_LOGIN = "Autenticazione fallita. Riprovare";
-    public static String ERROR_DIALOG_MESSAGE_FAILED_SIGNUP = "Registrazione fallita. Riprovare";
+    public static final String ERROR_DIALOG_TITLE = "Errore Autenticazione";
+    public static final String ERROR_DIALOG_MESSAGE_VALIDATION = "Compilare tutti i campi";
+    public static final String ERROR_DIALOG_MESSAGE_FAILED_LOGIN = "Autenticazione fallita. Riprovare";
+    public static final String ERROR_DIALOG_MESSAGE_FAILED_SIGNUP = "Registrazione fallita. Riprovare";
 
-    public static String PROGRESS_DIALOG_TITLE = "Caricamento";
-    public static String PROGRESS_DIALOG_MESSAGE = "Si prega di attendere...";
+    public static final String PROGRESS_DIALOG_TITLE = "Caricamento";
+    public static final String PROGRESS_DIALOG_MESSAGE = "Si prega di attendere...";
 
     //gestione mail
-    public static  String ALERT_EMPTY_EMAIL_TITLE = "Campo email vuoto";
-    public static  String ALERT_EMPTY_EMAIL_MESSAGE = "Inserisci prima la tua email";
-    public static  String ERROR_SEND_MAIL = "Errore Invio email";
-    public static  String ERROR_SEND_MAIL_MESSAGE = "email non inviata correttamente";
+    public static final String ALERT_EMPTY_EMAIL_TITLE = "Campo email vuoto";
+    public static final String ALERT_EMPTY_EMAIL_MESSAGE = "Inserisci prima la tua email";
+    public static final String ERROR_SEND_MAIL = "Errore invio email";
+    public static final String ERROR_SEND_MAIL_MESSAGE = "Email non inviata correttamente";
 
     //fragment settings
-    public static  String ALERT_EMPTY_PASSWORD_TITLE = "Campo password vuoto";
-    public static  String ALERT_EMPTY_PASSWORD_MESSAGE = "Inserisci una nuova password";
-    public static  String ERROR_UPDATE_PASSWORD = "Errore aggiornamento password";
-    public static  String ERROR_UPDATE_PASSWORD_MESSAGE = "Aggiornamento non effettuato correttamente";
-    public static  String ERROR_GET_USER = "Errore recupero utente";
-    public static  String ERROR_GET_USER_MESSAGE = "non è stato recuperato correttamente l'utente";
-    public static  String ERROR_DELETE_USER = "Errore eliminazione account";
-    public static  String ERROR_DELETE_USER_MESSAGE = "Eliminazione Account non avvenuta correttamente";
-    public static  String ALERT_EMPTY_PASSWORD_ELIMINA_MESSAGE = "Inserisci prima la tua password";
+    public static final String ALERT_EMPTY_PASSWORD_TITLE = "Campo password vuoto";
+    public static final String ALERT_EMPTY_PASSWORD_MESSAGE = "Inserisci una nuova password";
+    public static final String ERROR_UPDATE_PASSWORD = "Errore aggiornamento password";
+    public static final String ERROR_UPDATE_PASSWORD_MESSAGE = "Aggiornamento non effettuato correttamente";
+    public static final String ERROR_GET_USER = "Errore recupero utente";
+    public static final String ERROR_GET_USER_MESSAGE = "Non è stato recuperato correttamente l'utente";
+    public static final String ERROR_DELETE_USER = "Errore eliminazione account";
+    public static final String ERROR_DELETE_USER_MESSAGE = "Eliminazione account non avvenuta correttamente";
+    public static final String ALERT_EMPTY_PASSWORD_ELIMINA_MESSAGE = "Inserisci prima la tua password";
 
     // ANSWER of fragment FAQ
-    public static  String FIRST_ANSWER = " Una volta fatto il login, è possibile o ricercare una partita nelle" +
-            " vicinanze premendo il bottone \"CERCA PARTITE\" o crearne una propria premendo il bottone \"CREA PARTITA\" " +
-            " inserendo il nome della partita e la durata e rimanere in attesa che altri giocatori" +
-            " si uniscano alla tua partita";
-    public static  String SECOND_ANSWER = "Sulla schermata del Login sotto all\' inserimento della password e cliccare su \"Ho dimenticato" +
-            " la Password\", verrà così inviata una mail sulla propria casella postale" +
-            " contenente un link per il reset della password";
-    public static String THIRD_ANSWER = "è possibile aggiornare la propria password nella schermata IMPOSTAZIONI, cliccando su AGGIORNA dopo aver inserito la vecchia e la nuova password";
-    public static  String FOURTH_ANSWER = "Nella schermata IMPOSTAZIONI in basso c'è il bottone per l'eliminazione dell'account, sarà prima necessario inserire la password corrente";
-    public static  String FIFTH_ANSWER = "";
+    public static final String FIRST_ANSWER = "È possibile o ricercare una partita nelle" +
+            " vicinanze premendo il bottone \"CERCA PARTITA\" o crearne una premendo il bottone \"CREA PARTITA\". " +
+            "  Basta inserire la durata in minuti e rimanere in attesa che altri giocatori" +
+            " si uniscano al gioco.";
+    public static final String SECOND_ANSWER = "Sulla schermata di login, sotto all\' inserimento della password tocca \"Ho dimenticato" +
+            " la Password\", verrà così inviata una mail sulla propria casella di posta, all'indirizzo specificato in fase di registrazione" +
+            " contenente un link per il reset della password.";
+    public static final String THIRD_ANSWER = "È possibile aggiornare la propria password nella schermata IMPOSTAZIONI, cliccando su \"AGGIORNA\", dopo aver inserito la vecchia e la nuova password.";
+    public static final String FOURTH_ANSWER = "Nella schermata IMPOSTAZIONI in basso troverai il bottone per l'eliminazione dell'account, sarà prima necessario inserire la password corrente" +
+            " per confermare l'azione che sarà irreversibile.";
+    public static final String FIFTH_ANSWER = "Per la ricerca di giocatori nelle vicinanze l'applicazione utilizza \"Nearby\". Assicurati quindi" +
+            " di avere attivato il Wi-Fi o la connessione dati mobili, il Bluetooth e la geolocalizzazione. Se pensi sia già tutto a posto, controlla nelle impostazioni del" +
+            " dispositivo se sono state concesse tutte le autorizzazioni necessarie per l'applicazione \"Walk!\". Se ancora non riesci a creare o trovare una partita," +
+            " sempre nelle impostazioni del dispositivo, controlla che l'applicazione sia nella lista delle eccezioni per quanto riguarda l'ottimizzazione della batteria" +
+            " e il risparmio energetico.";
 
 }
