@@ -91,6 +91,7 @@ public class Util {
     public static String PROGRESS_DIALOG_TITLE = "Caricamento";
     public static String PROGRESS_DIALOG_MESSAGE = "Si prega di attendere...";
 
+    //gestione mail
     public static  String ALERT_EMPTY_EMAIL_TITLE = "Campo email vuoto";
     public static  String ALERT_EMPTY_EMAIL_MESSAGE = "Inserisci prima la tua email";
     public static  String ERROR_SEND_MAIL = "Errore Invio email";
@@ -107,7 +108,7 @@ public class Util {
     public static  String ERROR_DELETE_USER_MESSAGE = "Eliminazione Account non avvenuta correttamente";
     public static  String ALERT_EMPTY_PASSWORD_ELIMINA_MESSAGE = "Inserisci prima la tua password";
 
-    //fragment FAQ
+    // ANSWER of fragment FAQ
     public static  String FIRST_ANSWER = " Una volta fatto il login, è possibile o ricercare una partita nelle" +
             " vicinanze premendo il bottone \"CERCA PARTITE\" o crearne una propria premendo il bottone \"CREA PARTITA\" " +
             " inserendo il nome della partita e la durata e rimanere in attesa che altri giocatori" +
@@ -116,7 +117,7 @@ public class Util {
             " la Password\", verrà così inviata una mail sulla propria casella postale" +
             " contenente un link per il reset della password";
     public static String THIRD_ANSWER = "è possibile aggiornare la propria password nella schermata IMPOSTAZIONI, cliccando su AGGIORNA dopo aver inserito la vecchia e la nuova password";
-
     public static  String FOURTH_ANSWER = "Nella schermata IMPOSTAZIONI in basso c'è il bottone per l'eliminazione dell'account, sarà prima necessario inserire la password corrente";
+    public static  String FIFTH_ANSWER = "";
 
 }

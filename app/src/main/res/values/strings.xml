@@ -98,5 +98,5 @@
     <string name="second_question">2. Come faccio se dimentico la password e non riesco ad accedere?</string>
     <string name="third_question">3. Come aggiorno la mia password?</string>
     <string name="fourth_question">4. Come elimino il mio account?</string>
-
+    <string name="fifth_question">5. Non riesco a trovare una partita</string>
 </resources>

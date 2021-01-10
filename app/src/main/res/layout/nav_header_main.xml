@@ -18,6 +18,7 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:contentDescription="@string/nav_header_desc"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,13 +26,13 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.016"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@mipmap/walk_logo_foreground" />
 
     <TextView
         android:id="@+id/titoloApp"
-        android:layout_width="50dp"
-        android:layout_height="32dp"
+        android:layout_width="40dp"
+        android:layout_height="34dp"
         android:fontFamily="sans-serif-light"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/nav_header_title"
@@ -46,8 +47,8 @@
 
     <TextView
         android:id="@+id/navUsername"
-        android:layout_width="112dp"
-        android:layout_height="42dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:textColor="#000000"
         android:textSize="30sp"

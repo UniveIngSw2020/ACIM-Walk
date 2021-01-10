@@ -43,13 +43,18 @@ public class FaqFragment extends Fragment {
                 Util.showErrorAlert(getContext(), "Aggiornamento Password", Util.THIRD_ANSWER);
             }
         });
-        root.findViewById(R.id.fouth_question).setOnClickListener(new View.OnClickListener() {
+        root.findViewById(R.id.fourth_question).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Util.showErrorAlert(getContext(), "Eliminazione Account", Util.FOURTH_ANSWER);
             }
         });
-
+        root.findViewById(R.id.fifth_question).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Util.showErrorAlert(getContext(), "Partita non trovata", Util.FIFTH_ANSWER);
+            }
+        });
         //set visible
         MainActivity activity = (MainActivity)getActivity();
         NavigationView nav = activity.getNavigation();
