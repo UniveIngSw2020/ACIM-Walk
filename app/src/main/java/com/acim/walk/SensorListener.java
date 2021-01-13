@@ -40,11 +40,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
     //useful to understand where log messages come from
     private final String TAG = "SensorListenerClass";
 
-    private final static long MICROSECONDS_IN_ONE_MINUTE = 60000000;
-    private final static int SAVE_OFFSET_STEPS = 1;
-
-
-    private final static long SAVE_OFFSET_TIME = 30000;
+    private final static long SAVE_OFFSET_TIME = 3000;
     public final static String NOTIFICATION_CHANNEL_ID = "Notification";
     public final static int NOTIFICATION_ID = 1; //notification id
     private static int sensorSteps;
@@ -307,7 +303,7 @@ public class SensorListener extends Service implements SensorEventListener2 {
         }
         // for demo purposes sensors set to be very reactive
         sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
-                SensorManager.SENSOR_DELAY_FASTEST, (int) (6000000));
+                SensorManager.SENSOR_DELAY_FASTEST, (int) (0));
     }
 
     /**

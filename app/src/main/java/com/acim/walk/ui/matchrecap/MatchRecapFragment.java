@@ -198,7 +198,7 @@ public class MatchRecapFragment extends Fragment {
                             }
                         });
             }
-        }, 0, 1, TimeUnit.SECONDS);
+        }, 0, 3, TimeUnit.SECONDS);
 
 
         showRanking.setOnClickListener(new View.OnClickListener() {
