@@ -51,6 +51,7 @@ public class NewmatchFragment extends Fragment {
     private final String JSON_USERNAME = "username";
     private final String JSON_MATCH_ID = "matchId";
     private final String JSON_IS_HOST = "isHost";
+    private final String JSON_IS_LEAVING_GAME = "isLeaving";
 
     private NewMatchViewModel newMatchViewModel;
 
@@ -109,6 +110,14 @@ public class NewmatchFragment extends Fragment {
                     String receivedEmail = receivedObject.getString(JSON_EMAIL);
                     String receivedUsername = receivedObject.getString(JSON_USERNAME);
                     Boolean isHost = receivedObject.getBoolean(JSON_IS_HOST);
+
+                    // we need to understand if this message is a LEAVING message
+                    // a message the tells that a user is quitting/not accepting a game invitation
+                    Boolean isLeavingGame = false;
+                    if(receivedObject.has(JSON_IS_LEAVING_GAME)) {
+                        isLeavingGame = true;
+                    }
+
                     User receivedUser = new User(receivedEmail, receivedId, receivedUsername);
 
                     //check if current user has to be added in the game
@@ -125,6 +134,15 @@ public class NewmatchFragment extends Fragment {
                             userList.add(receivedUsername);
                             adapter.notifyDataSetChanged(); //updates the listview
                         }
+                    }
+
+                    // if someone is leaving the game, we need to remove them from the participants of this game
+                    if(isLeavingGame) {
+                        // removing the participant from the match
+                        participants.removeIf(user -> user.getUserId().equals(receivedId));
+                        // removing username from the displayed list
+                        userList.remove(receivedUsername);
+                        adapter.notifyDataSetChanged(); //updates the listview
                     }
 
                 } catch (JSONException e) {

@@ -52,6 +52,7 @@ public class SearchMatchFragment extends Fragment {
     private final String JSON_EMAIL = "userEmail";
     private final String JSON_USERNAME = "username";
     private final String JSON_IS_HOST = "isHost";
+    private final String JSON_IS_LEAVING_GAME = "isLeaving";
 
     private SearchMatchViewModel searchMatchViewModel;
 
@@ -241,6 +242,27 @@ public class SearchMatchFragment extends Fragment {
 
     @Override
     public void onStop() {
+
+        /*
+         * user IS LEAVING this game invitation.
+         * a different message format is needed to let the HOST know.
+         * we just add a 'IS_LEAVING_GAME' flag that the HOST will check on each message
+         */
+        JSONObject userInfo = new JSONObject();
+        try {
+            userInfo.put(JSON_ID, userId);
+            userInfo.put(JSON_EMAIL, userEmail);
+            userInfo.put(JSON_USERNAME, username);
+            userInfo.put(JSON_IS_HOST, false);
+            userInfo.put(JSON_IS_LEAVING_GAME, true);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        //sending JSON object to nearby devices
+        publish(userInfo.toString());
+
+
+
         // Close the methods publish and subscribe, so close Nearby function
         unpublish();
         unsubscribe();
