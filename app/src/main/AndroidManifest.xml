@@ -36,7 +36,7 @@
 
         <meta-data
             android:name="com.google.android.nearby.messages.API_KEY"
-            android:value="AIzaSyAAtVs3hAMFYS-V-vXcfV89_EwPGBw62qE" />
+            android:value="AIzaSyBmi4Zim_ckNyceCwplUY7jwac4vQG8ns4" />
         <!-- Riccardo KEY: AIzaSyCDu_GRuMscxeBtDKUuIdeJoYHjzSnNeqA -->
         <!-- Vittorio KEY: AIzaSyAAtVs3hAMFYS-V-vXcfV89_EwPGBw62qE -->
         <!-- Samuele KEY: AIzaSyBmi4Zim_ckNyceCwplUY7jwac4vQG8ns4 -->
