@@ -40,7 +40,7 @@
         <!-- Riccardo KEY: AIzaSyCDu_GRuMscxeBtDKUuIdeJoYHjzSnNeqA -->
         <!-- Vittorio KEY: AIzaSyAAtVs3hAMFYS-V-vXcfV89_EwPGBw62qE -->
         <!-- Samuele KEY: AIzaSyBmi4Zim_ckNyceCwplUY7jwac4vQG8ns4 -->
-        <!-- Esmir KEY: :D -->
+        <!-- Esmir KEY: AIzaSyAhXrcDNaNY5DXZxaYfO7nbtOxIcyanVig -->
 
         <receiver android:name=".BootReceiver">
             <intent-filter>
